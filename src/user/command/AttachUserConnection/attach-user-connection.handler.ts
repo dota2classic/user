@@ -1,13 +1,13 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
-import { AttachUserConnectionCommand } from '../../../gateway/commands/attach-user-connection.command';
+import { AttachUserConnectionCommand } from 'src/gateway/commands/attach-user-connection.command';
 import { UserConnectionEntity } from '../../model/user-connection.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../../model/user.entity';
-import { UserConnectionCreatedEvent } from '../../../gateway/events/user/user-connection-created.event';
-import { PlayerId } from '../../../gateway/shared-types/player-id';
-import { UserCreatedEvent } from '../../../gateway/events/user/user-created.event';
+import { UserConnectionCreatedEvent } from 'src/gateway/events/user/user-connection-created.event';
+import { PlayerId } from 'src/gateway/shared-types/player-id';
+import { UserCreatedEvent } from 'src/gateway/events/user/user-created.event';
 
 @CommandHandler(AttachUserConnectionCommand)
 export class AttachUserConnectionHandler

@@ -13,7 +13,7 @@ export class UserConnectionEntity {
   })
   user!: UserEntity;
 
-  @Column()
+  @PrimaryColumn()
   external_id: string;
 
   @Column()
