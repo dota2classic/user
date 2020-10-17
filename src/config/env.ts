@@ -15,3 +15,6 @@ export const DB_HOST = () => process.env.POSTGRES_HOST
 export const profile = process.env.PROFILE;
 export const isProd = profile === 'prod';
 export const isDev = !isProd;
+
+
+export const HOST_PORT = process.env.USER_PORT

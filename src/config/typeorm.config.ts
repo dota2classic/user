@@ -1,8 +1,12 @@
 import {DB_HOST, DB_PASSWORD, DB_USERNAME} from "./env";
+import { UserEntity } from '../user/model/user.entity';
+import { UserConnectionEntity } from '../user/model/user-connection.entity';
 
 export const Entities = [
-
+  UserEntity,
+  UserConnectionEntity
 ]
+
 export const devDbConfig: any = {
   type: 'postgres',
   database: 'postgres',
