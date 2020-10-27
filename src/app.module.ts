@@ -6,10 +6,12 @@ import { devDbConfig, Entities, prodDbConfig } from './config/typeorm.config';
 import { isDev, REDIS_URL } from './config/env';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserProviders } from './user';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     CqrsModule,
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(
       (isDev ? devDbConfig : prodDbConfig) as TypeOrmModuleOptions,
     ),
