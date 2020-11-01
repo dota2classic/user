@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { HOST_PORT, REDIS_URL } from './config/env';
+import { HOST_PORT, REDIS_PASSWORD, REDIS_URL } from './config/env';
 import { Transport } from '@nestjs/microservices';
 import { CommandBus, EventBus, EventPublisher, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
@@ -17,6 +17,7 @@ async function bootstrap() {
       url: REDIS_URL(),
       retryAttempts: Infinity,
       retryDelay: 5000,
+      password: REDIS_PASSWORD(),
     },
   });
 
