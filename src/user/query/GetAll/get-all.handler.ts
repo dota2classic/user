@@ -21,7 +21,7 @@ export class GetAllHandler
     const all = await this.userEntityRepository.find();
 
     return new GetAllQueryResult(
-      all.map(t => new UserEntry(new PlayerId(t.steam_id), t.name)),
+      all.map(t => new UserEntry(new PlayerId(t.steam_id), t.name, t.avatar)),
     );
   }
 }

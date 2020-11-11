@@ -5,6 +5,7 @@ import { create } from 'apisauce';
 import { steam32to64, steam64to32 } from 'src/user/util/steamIds';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { inspect } from 'util';
 
 const steamapi = create({
   baseURL: 'http://api.steampowered.com',
@@ -18,11 +19,11 @@ interface TranslatedSteamId {
 interface SteamProfile {
   steamid: string;
   personaname: string;
+  avatarfull: string;
 }
 
 @Injectable()
 export class UserService {
-
   private readonly logger = new Logger(UserService.name);
 
   constructor(
@@ -32,9 +33,9 @@ export class UserService {
 
   @Cron('0 * * * *')
   async handleCron() {
-    this.logger.log(`Starting resolving names`)
+    this.logger.log(`Starting resolving names`);
     await this.usernameResolverTask();
-    this.logger.log(`Resolved names`)
+    this.logger.log(`Resolved names`);
   }
 
   private async getUsernames(players: UserEntity[]): Promise<SteamProfile[]> {
@@ -58,11 +59,13 @@ export class UserService {
       const profiles = await this.getUsernames(
         players.slice(i * 100, (i + 1) * 100),
       );
+
       profiles.forEach(prof => {
         const steam_32 = steam64to32(prof.steamid);
         const player = players.find(t => t.steam_id === steam_32);
         if (player) {
           player.name = prof.personaname;
+          player.avatar = prof.avatarfull;
         }
       });
     }

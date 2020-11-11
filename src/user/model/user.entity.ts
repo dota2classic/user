@@ -8,4 +8,8 @@ export class UserEntity {
 
   @Column({ default: ""})
   name: string
+
+
+  @Column({ nullable: true })
+  avatar: string
 }

@@ -21,6 +21,6 @@ export class GetUserInfoHandler
       steam_id: command.playerId.value,
     });
 
-    return new GetUserInfoQueryResult(command.playerId, res?.name || "");
+    return new GetUserInfoQueryResult(command.playerId, res?.name || "", res?.avatar || "");
   }
 }
