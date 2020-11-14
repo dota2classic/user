@@ -4,6 +4,8 @@ import { GetAllConnectionsHandler } from 'src/user/query/GetAllConnections/get-a
 import { GetAllHandler } from 'src/user/query/GetAll/get-all.handler';
 import { GetUserInfoHandler } from 'src/user/query/GetUserInfo/get-user-info.handler';
 import { UserService } from 'src/user/user.service';
+import { UpdateUserRolesHandler } from 'src/user/command/UpdateUserRoles/update-user-roles.handler';
+import { UserSaga } from 'src/user/saga/user.saga';
 
 const Sagas = [];
 const EventHandlers = [];
@@ -12,9 +14,9 @@ const QueryHandlers = [
   GetByConnectionHandler,
   GetAllConnectionsHandler,
   GetAllHandler,
-  GetUserInfoHandler
+  GetUserInfoHandler,
 ];
-const CommandHandlers = [AttachUserConnectionHandler];
+const CommandHandlers = [AttachUserConnectionHandler, UpdateUserRolesHandler];
 export const UserProviders = [
   ...CommandHandlers,
   ...Sagas,
@@ -22,5 +24,7 @@ export const UserProviders = [
   ...Repositories,
   ...QueryHandlers,
 
-  UserService
+
+  UserSaga,
+  UserService,
 ];

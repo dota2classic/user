@@ -5,9 +5,11 @@ import { Transport } from '@nestjs/microservices';
 import { CommandBus, EventBus, EventPublisher, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
 import { Subscriber } from 'rxjs';
+import { UserEntity } from 'src/user/model/user.entity';
 
 export function prepareModels(publisher: EventPublisher) {
   //
+  publisher.mergeClassContext(UserEntity)
 }
 
 async function bootstrap() {

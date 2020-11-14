@@ -7,7 +7,6 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../../model/user.entity';
 import { UserConnectionCreatedEvent } from 'src/gateway/events/user/user-connection-created.event';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
-import { UserCreatedEvent } from 'src/gateway/events/user/user-created.event';
 
 @CommandHandler(AttachUserConnectionCommand)
 export class AttachUserConnectionHandler
@@ -32,7 +31,8 @@ export class AttachUserConnectionHandler
       u = new UserEntity();
       u.steam_id = command.playerId.value;
       await this.userEntityRepository.save(u);
-      this.ebus.publish(new UserCreatedEvent(command.playerId));
+      u.created();
+      u.commit();
     }
 
     const existingConnection = await this.userConnectionEntityRepository.findOne(
