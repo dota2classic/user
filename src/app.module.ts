@@ -7,6 +7,7 @@ import { isDev, REDIS_PASSWORD, REDIS_URL } from './config/env';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserProviders } from './user';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AppService } from 'src/app.service';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { ScheduleModule } from '@nestjs/schedule';
   ],
   controllers: [AppController],
   providers: [
-    ...UserProviders
+    ...UserProviders,
+    AppService
   ],
 })
 export class AppModule {}

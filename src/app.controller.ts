@@ -1,19 +1,23 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { EventPattern, MessagePattern } from '@nestjs/microservices';
 import { GetByConnectionQueryResult } from './gateway/queries/GetByConnection/get-by-connection-query.result';
 import { GetByConnectionQuery } from './gateway/queries/GetByConnection/get-by-connection.query';
 import { construct } from './gateway/util/construct';
-import { QueryBus } from '@nestjs/cqrs';
+import { EventBus, QueryBus } from '@nestjs/cqrs';
 import { GetAllConnectionsQuery } from 'src/gateway/queries/GetAllConnections/get-all-connections.query';
 import { GetAllConnectionsQueryResult } from 'src/gateway/queries/GetAllConnections/get-all-connections-query.result';
 import { GetAllQuery } from './gateway/queries/GetAll/get-all.query';
 import { GetAllQueryResult } from 'src/gateway/queries/GetAll/get-all-query.result';
 import { GetUserInfoQueryResult } from 'src/gateway/queries/GetUserInfo/get-user-info-query.result';
 import { GetUserInfoQuery } from './gateway/queries/GetUserInfo/get-user-info.query';
+import { UserRolesUpdatedEvent } from 'src/gateway/events/user/user-roles-updated.event';
 
 @Controller()
 export class AppController {
-  constructor(private readonly qbus: QueryBus) {}
+  constructor(
+    private readonly qbus: QueryBus,
+    private readonly ebus: EventBus,
+  ) {}
 
   @MessagePattern(GetByConnectionQuery.name)
   async GetByConnectionQuery(
@@ -30,17 +34,19 @@ export class AppController {
   }
 
   @MessagePattern(GetAllQuery.name)
-  async GetAllQuery(
-    query: GetAllQuery,
-  ): Promise<GetAllQueryResult> {
+  async GetAllQuery(query: GetAllQuery): Promise<GetAllQueryResult> {
     return this.qbus.execute(construct(GetAllQuery, query));
   }
-
 
   @MessagePattern(GetUserInfoQuery.name)
   async GetUserInfoQuery(
     query: GetUserInfoQuery,
   ): Promise<GetUserInfoQueryResult> {
     return this.qbus.execute(construct(GetUserInfoQuery, query));
+  }
+
+  @EventPattern(GetAllQuery.name)
+  async UserRolesUpdatedEvent(query: UserRolesUpdatedEvent) {
+    return this.ebus.publish(construct(UserRolesUpdatedEvent, query));
   }
 }
