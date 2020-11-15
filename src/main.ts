@@ -6,10 +6,11 @@ import { CommandBus, EventBus, EventPublisher, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
 import { Subscriber } from 'rxjs';
 import { UserEntity } from 'src/user/model/user.entity';
+import { inspect } from 'util';
 
 export function prepareModels(publisher: EventPublisher) {
   //
-  publisher.mergeClassContext(UserEntity)
+  publisher.mergeClassContext(UserEntity);
 }
 
 async function bootstrap() {
@@ -23,7 +24,6 @@ async function bootstrap() {
     },
   });
 
-
   const ebus = app.get(EventBus);
   const cbus = app.get(CommandBus);
   const qbus = app.get(QueryBus);
@@ -35,26 +35,22 @@ async function bootstrap() {
   ebus._subscribe(
     new Subscriber<any>(e => {
       elogger.log(
-        // `${inspect(e)}`,
-        e.__proto__.constructor.name,
+        `${inspect(e)}`,
+        // e.__proto__.constructor.name,
       );
     }),
   );
 
+
   cbus._subscribe(
     new Subscriber<any>(e => {
-      clogger.log(
-        // `${inspect(e)}`,
-        e.__proto__.constructor.name,
-      );
+      clogger.log(`${inspect(e)}, ${e.__proto__.constructor.name}`);
     }),
   );
 
   qbus._subscribe(
     new Subscriber<any>(e => {
-      qlogger.log(
-        e.__proto__.constructor.name,
-      );
+      qlogger.log(e.__proto__.constructor.name);
     }),
   );
 

@@ -45,7 +45,7 @@ export class AppController {
     return this.qbus.execute(construct(GetUserInfoQuery, query));
   }
 
-  @EventPattern(GetAllQuery.name)
+  @EventPattern(UserRolesUpdatedEvent.name)
   async UserRolesUpdatedEvent(query: UserRolesUpdatedEvent) {
     return this.ebus.publish(construct(UserRolesUpdatedEvent, query));
   }
