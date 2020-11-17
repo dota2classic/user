@@ -6,6 +6,7 @@ import { GetUserInfoHandler } from 'src/user/query/GetUserInfo/get-user-info.han
 import { UserService } from 'src/user/user.service';
 import { UpdateUserRolesHandler } from 'src/user/command/UpdateUserRoles/update-user-roles.handler';
 import { UserSaga } from 'src/user/saga/user.saga';
+import { GetConnectionsHandler } from 'src/user/query/GetConnection/get-connection.handler';
 
 const Sagas = [];
 const EventHandlers = [];
@@ -15,6 +16,7 @@ const QueryHandlers = [
   GetAllConnectionsHandler,
   GetAllHandler,
   GetUserInfoHandler,
+  GetConnectionsHandler
 ];
 const CommandHandlers = [AttachUserConnectionHandler, UpdateUserRolesHandler];
 export const UserProviders = [

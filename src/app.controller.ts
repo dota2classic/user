@@ -12,6 +12,8 @@ import { GetUserInfoQueryResult } from 'src/gateway/queries/GetUserInfo/get-user
 import { GetUserInfoQuery } from './gateway/queries/GetUserInfo/get-user-info.query';
 import { UserRolesUpdatedEvent } from 'src/gateway/events/user/user-roles-updated.event';
 import { AttachUserConnectionCommand } from './gateway/commands/attach-user-connection.command';
+import { GetConnectionsQuery } from './gateway/queries/GetConnections/get-connections.query';
+import { GetConnectionsQueryResult } from 'src/gateway/queries/GetConnections/get-connections-query.result';
 
 @Controller()
 export class AppController {
@@ -47,14 +49,19 @@ export class AppController {
     return this.qbus.execute(construct(GetUserInfoQuery, query));
   }
 
+  @MessagePattern(GetConnectionsQuery.name)
+  async GetConnectionsQuery(
+    query: GetConnectionsQuery,
+  ): Promise<GetConnectionsQueryResult> {
+    return this.qbus.execute(construct(GetConnectionsQuery, query));
+  }
+
   @MessagePattern(AttachUserConnectionCommand.name)
   async AttachUserConnectionCommand(
     query: AttachUserConnectionCommand,
   ): Promise<GetUserInfoQueryResult> {
     return this.cbus.execute(construct(AttachUserConnectionCommand, query));
   }
-
-
 
   @EventPattern(UserRolesUpdatedEvent.name)
   async UserRolesUpdatedEvent(query: UserRolesUpdatedEvent) {
