@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { UserEntity } from 'src/user/model/user.entity';
 import { create } from 'apisauce';
 import { steam32to64, steam64to32 } from 'src/user/util/steamIds';
@@ -31,7 +31,7 @@ export class UserService {
     private readonly userEntityRepository: Repository<UserEntity>,
   ) {}
 
-  @Cron('0 * * * *')
+  @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
     this.logger.log(`Starting resolving names`);
     await this.usernameResolverTask();
