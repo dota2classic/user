@@ -7,6 +7,7 @@ import { Logger } from '@nestjs/common';
 import { Subscriber } from 'rxjs';
 import { UserEntity } from 'src/user/model/user.entity';
 import { inspect } from 'util';
+import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
 
 export function prepareModels(publisher: EventPublisher) {
   //
@@ -34,9 +35,10 @@ async function bootstrap() {
 
   ebus._subscribe(
     new Subscriber<any>(e => {
+
       elogger.log(
-        `${inspect(e)}`,
-        // e.__proto__.constructor.name,
+        // `${inspect(e)}`,
+        e.__proto__.constructor.name,
       );
     }),
   );

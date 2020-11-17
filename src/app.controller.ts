@@ -3,7 +3,7 @@ import { EventPattern, MessagePattern } from '@nestjs/microservices';
 import { GetByConnectionQueryResult } from './gateway/queries/GetByConnection/get-by-connection-query.result';
 import { GetByConnectionQuery } from './gateway/queries/GetByConnection/get-by-connection.query';
 import { construct } from './gateway/util/construct';
-import { EventBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus, EventBus, QueryBus } from '@nestjs/cqrs';
 import { GetAllConnectionsQuery } from 'src/gateway/queries/GetAllConnections/get-all-connections.query';
 import { GetAllConnectionsQueryResult } from 'src/gateway/queries/GetAllConnections/get-all-connections-query.result';
 import { GetAllQuery } from './gateway/queries/GetAll/get-all.query';
@@ -11,11 +11,13 @@ import { GetAllQueryResult } from 'src/gateway/queries/GetAll/get-all-query.resu
 import { GetUserInfoQueryResult } from 'src/gateway/queries/GetUserInfo/get-user-info-query.result';
 import { GetUserInfoQuery } from './gateway/queries/GetUserInfo/get-user-info.query';
 import { UserRolesUpdatedEvent } from 'src/gateway/events/user/user-roles-updated.event';
+import { AttachUserConnectionCommand } from './gateway/commands/attach-user-connection.command';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly qbus: QueryBus,
+    private readonly cbus: CommandBus,
     private readonly ebus: EventBus,
   ) {}
 
@@ -44,6 +46,15 @@ export class AppController {
   ): Promise<GetUserInfoQueryResult> {
     return this.qbus.execute(construct(GetUserInfoQuery, query));
   }
+
+  @MessagePattern(AttachUserConnectionCommand.name)
+  async AttachUserConnectionCommand(
+    query: AttachUserConnectionCommand,
+  ): Promise<GetUserInfoQueryResult> {
+    return this.cbus.execute(construct(AttachUserConnectionCommand, query));
+  }
+
+
 
   @EventPattern(UserRolesUpdatedEvent.name)
   async UserRolesUpdatedEvent(query: UserRolesUpdatedEvent) {

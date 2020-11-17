@@ -34,7 +34,7 @@ export class UserService {
     private readonly userEntityRepository: Repository<UserEntity>,
     private readonly ebus: EventBus,
   ) {
-    this.handleCron();
+    // this.handleCron();
   }
 
   @Cron(CronExpression.EVERY_HOUR)
