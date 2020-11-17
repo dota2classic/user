@@ -55,7 +55,17 @@ export class AttachUserConnectionHandler
       );
     }
 
-    const con = new UserConnectionEntity();
+
+    let con = await this.userConnectionEntityRepository.findOne(
+      {
+        connection: command.connection,
+        steam_id: command.playerId.value
+      },
+    );
+
+    await this.userConnectionEntityRepository.delete(con);
+
+    con = new UserConnectionEntity();
     con.steam_id = u.steam_id;
     con.connection = command.connection;
     con.external_id = command.externalId;

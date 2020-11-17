@@ -16,6 +16,6 @@ export class UserConnectionEntity {
   @PrimaryColumn()
   external_id: string;
 
-  @Column()
+  @PrimaryColumn()
   connection: UserConnection;
 }
