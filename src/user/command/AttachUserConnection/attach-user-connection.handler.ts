@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../../model/user.entity';
 import { UserConnectionCreatedEvent } from 'src/gateway/events/user/user-connection-created.event';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
+import { UserConnectionDeletedEvent } from 'src/gateway/events/user/user-connection-deleted.event';
 
 @CommandHandler(AttachUserConnectionCommand)
 export class AttachUserConnectionHandler
@@ -37,24 +38,34 @@ export class AttachUserConnectionHandler
 
     const existingConnection = await this.userConnectionEntityRepository.findOne(
       {
-        steam_id: u.steam_id,
         connection: command.connection,
         external_id: command.externalId,
       },
     );
-    if (!existingConnection) {
-      const con = new UserConnectionEntity();
-      con.steam_id = u.steam_id;
-      con.connection = command.connection;
-      con.external_id = command.externalId;
-      await this.userConnectionEntityRepository.save(con);
+
+    // if there is connection, we delete it(no duplicates)
+    if (existingConnection) {
+      await this.userConnectionEntityRepository.delete(existingConnection);
       this.ebus.publish(
-        new UserConnectionCreatedEvent(
-          new PlayerId(con.steam_id),
-          con.connection,
-          con.external_id,
+        new UserConnectionDeletedEvent(
+          new PlayerId(existingConnection.steam_id),
+          existingConnection.connection,
+          existingConnection.external_id,
         ),
       );
     }
+
+    const con = new UserConnectionEntity();
+    con.steam_id = u.steam_id;
+    con.connection = command.connection;
+    con.external_id = command.externalId;
+    await this.userConnectionEntityRepository.save(con);
+    this.ebus.publish(
+      new UserConnectionCreatedEvent(
+        new PlayerId(con.steam_id),
+        con.connection,
+        con.external_id,
+      ),
+    );
   }
 }
