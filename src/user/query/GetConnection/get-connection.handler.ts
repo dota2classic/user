@@ -25,6 +25,8 @@ export class GetConnectionsHandler
       connection: command.connection,
     });
 
+    if(!con) return;
+
     return new GetConnectionsQueryResult(
       new ConnectionEntry(command.playerId, con.connection, con.external_id),
     );
