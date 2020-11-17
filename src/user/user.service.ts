@@ -5,7 +5,10 @@ import { create } from 'apisauce';
 import { steam32to64, steam64to32 } from 'src/user/util/steamIds';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { inspect } from 'util';
+import { EventBus } from '@nestjs/cqrs';
+import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
+import { UserEntry } from 'src/gateway/queries/GetAll/get-all-query.result';
+import { PlayerId } from 'src/gateway/shared-types/player-id';
 
 const steamapi = create({
   baseURL: 'http://api.steampowered.com',
@@ -29,7 +32,10 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userEntityRepository: Repository<UserEntity>,
-  ) {}
+    private readonly ebus: EventBus,
+  ) {
+    this.handleCron();
+  }
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
@@ -66,6 +72,17 @@ export class UserService {
         if (player) {
           player.name = prof.personaname;
           player.avatar = prof.avatarfull;
+
+          this.ebus.publish(
+            new UserUpdatedEvent(
+              new UserEntry(
+                new PlayerId(steam_32),
+                player.name,
+                player.avatar,
+                player.userRoles,
+              ),
+            ),
+          );
         }
       });
     }
