@@ -55,15 +55,12 @@ export class AttachUserConnectionHandler
       );
     }
 
+    let con = await this.userConnectionEntityRepository.findOne({
+      connection: command.connection,
+      steam_id: command.playerId.value,
+    });
 
-    let con = await this.userConnectionEntityRepository.findOne(
-      {
-        connection: command.connection,
-        steam_id: command.playerId.value
-      },
-    );
-
-    await this.userConnectionEntityRepository.delete(con);
+    if (con) await this.userConnectionEntityRepository.delete(con);
 
     con = new UserConnectionEntity();
     con.steam_id = u.steam_id;

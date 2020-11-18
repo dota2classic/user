@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
 import { UserCreatedEvent } from 'src/gateway/events/user/user-created.event';
 import { ClientProxy } from '@nestjs/microservices';
+import { UserConnectionCreatedEvent } from 'src/gateway/events/user/user-connection-created.event';
 
 @Injectable()
 export class AppService {
@@ -16,7 +17,7 @@ export class AppService {
       await this.redisEventQueue.connect();
     } catch (e) {}
 
-    const publicEvents: any[] = [UserUpdatedEvent, UserCreatedEvent];
+    const publicEvents: any[] = [UserUpdatedEvent, UserCreatedEvent, UserConnectionCreatedEvent];
 
     this.ebus
       .pipe(ofType(...publicEvents))
