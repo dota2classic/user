@@ -7,9 +7,12 @@ import { UserService } from 'src/user/user.service';
 import { UpdateUserRolesHandler } from 'src/user/command/UpdateUserRoles/update-user-roles.handler';
 import { UserSaga } from 'src/user/saga/user.saga';
 import { GetConnectionsHandler } from 'src/user/query/GetConnection/get-connection.handler';
+import { UserMightExistHandler } from 'src/user/event-handler/user-might-exist.handler';
 
 const Sagas = [];
-const EventHandlers = [];
+const EventHandlers = [
+  UserMightExistHandler
+];
 const Repositories = [];
 const QueryHandlers = [
   GetByConnectionHandler,

@@ -14,6 +14,7 @@ import { UserRolesUpdatedEvent } from 'src/gateway/events/user/user-roles-update
 import { AttachUserConnectionCommand } from './gateway/commands/attach-user-connection.command';
 import { GetConnectionsQuery } from './gateway/queries/GetConnections/get-connections.query';
 import { GetConnectionsQueryResult } from 'src/gateway/queries/GetConnections/get-connections-query.result';
+import { UserMightExistEvent } from 'src/gateway/events/user/user-might-exist.event';
 
 @Controller()
 export class AppController {
@@ -66,5 +67,10 @@ export class AppController {
   @EventPattern(UserRolesUpdatedEvent.name)
   async UserRolesUpdatedEvent(query: UserRolesUpdatedEvent) {
     return this.ebus.publish(construct(UserRolesUpdatedEvent, query));
+  }
+
+  @EventPattern(UserMightExistEvent.name)
+  async UserMightExistEvent(query: UserMightExistEvent) {
+    return this.ebus.publish(construct(UserMightExistEvent, query));
   }
 }
