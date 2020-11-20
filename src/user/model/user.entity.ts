@@ -25,8 +25,7 @@ export class UserEntity extends AggregateRoot {
   }
 
   public set userRoles(r: Role[]) {
-    this.roles = this.userRoles
-      .concat(r)
+    this.roles = r
       .filter((value, index, self) => self.indexOf(value) === index)
       .join(',');
   }
@@ -46,5 +45,14 @@ export class UserEntity extends AggregateRoot {
 
   public created() {
     this.publish(new UserCreatedEvent(new PlayerId(this.steam_id)));
+  }
+
+  public asEntry(): UserEntry {
+    return new UserEntry(
+      new PlayerId(this.steam_id),
+      this.name,
+      this.avatar,
+      this.userRoles
+    )
   }
 }
