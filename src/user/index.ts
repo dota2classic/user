@@ -9,10 +9,12 @@ import { UserSaga } from 'src/user/saga/user.saga';
 import { GetConnectionsHandler } from 'src/user/query/GetConnection/get-connection.handler';
 import { UserMightExistHandler } from 'src/user/event-handler/user-might-exist.handler';
 import { RoleService } from 'src/user/service/role.service';
+import { RoleLifetimeUpdatedHandler } from 'src/user/event-handler/role-lifetime-updated.handler';
 
 const Sagas = [];
 const EventHandlers = [
-  UserMightExistHandler
+  UserMightExistHandler,
+  RoleLifetimeUpdatedHandler
 ];
 const Repositories = [];
 const QueryHandlers = [
@@ -20,7 +22,8 @@ const QueryHandlers = [
   GetAllConnectionsHandler,
   GetAllHandler,
   GetUserInfoHandler,
-  GetConnectionsHandler
+  GetConnectionsHandler,
+  UpdateUserRolesHandler
 ];
 const CommandHandlers = [AttachUserConnectionHandler, UpdateUserRolesHandler];
 export const UserProviders = [

@@ -15,6 +15,8 @@ import { AttachUserConnectionCommand } from './gateway/commands/attach-user-conn
 import { GetConnectionsQuery } from './gateway/queries/GetConnections/get-connections.query';
 import { GetConnectionsQueryResult } from 'src/gateway/queries/GetConnections/get-connections-query.result';
 import { UserMightExistEvent } from 'src/gateway/events/user/user-might-exist.event';
+import { GetRoleSubscriptionsQuery } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions.query';
+import { GetRoleSubscriptionsQueryResult } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions-query.result';
 
 @Controller()
 export class AppController {
@@ -48,6 +50,13 @@ export class AppController {
     query: GetUserInfoQuery,
   ): Promise<GetUserInfoQueryResult> {
     return this.qbus.execute(construct(GetUserInfoQuery, query));
+  }
+
+  @MessagePattern(GetRoleSubscriptionsQuery.name)
+  async GetRoleSubscriptionsQuery(
+    query: GetRoleSubscriptionsQuery,
+  ): Promise<GetRoleSubscriptionsQueryResult> {
+    return this.qbus.execute(construct(GetRoleSubscriptionsQuery, query));
   }
 
   @MessagePattern(GetConnectionsQuery.name)

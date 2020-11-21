@@ -27,36 +27,40 @@ export class RoleService {
     const lifetimes = await this.rlRep.find();
     for (let i = 0; i < lifetimes.length; i++) {
       const lifetime = lifetimes[i];
-      let u = await this.userEntityRepository.findOne({
-        steam_id: lifetime.steam_id,
-      });
-
-      if (!u) {
-        u = new UserEntity();
-        u.steam_id = lifetime.steam_id;
-        await this.userEntityRepository.save(u);
-      }
-
-      if (lifetime.isExpired) {
-        // if lifetime is expired, we need to remove role and delete lifetime
-        u.userRoles = [...u.userRoles].filter(t => t !== lifetime.role);
-
-        await this.userEntityRepository.save(u);
-
-        this.ebus.publish(new UserUpdatedEvent(u.asEntry()));
-
-        await this.rlRep.delete(lifetime.id);
-        this.logger.log(`Deleted expired lifetime`);
-      } else {
-        // if its active, we make sure user has role
-        const indx = u.userRoles.findIndex(t => t === lifetime.role);
-        if (indx === -1) {
-          u.userRoles = u.userRoles.concat([lifetime.role]);
-          await this.userEntityRepository.save(u);
-          this.ebus.publish(new UserUpdatedEvent(u.asEntry()));
-        }
-      }
+      await this.check(lifetime);
     }
     this.logger.log(`Finished checking roles`);
+  }
+
+  public async check(lifetime: UserRoleLifetimeEntity) {
+    let u = await this.userEntityRepository.findOne({
+      steam_id: lifetime.steam_id,
+    });
+
+    if (!u) {
+      u = new UserEntity();
+      u.steam_id = lifetime.steam_id;
+      await this.userEntityRepository.save(u);
+    }
+
+    if (lifetime.isExpired) {
+      // if lifetime is expired, we need to remove role and delete lifetime
+      u.userRoles = [...u.userRoles].filter(t => t !== lifetime.role);
+
+      await this.userEntityRepository.save(u);
+
+      this.ebus.publish(new UserUpdatedEvent(u.asEntry()));
+
+      await this.rlRep.delete(lifetime.id);
+      this.logger.log(`Deleted expired lifetime`);
+    } else {
+      // if its active, we make sure user has role
+      const indx = u.userRoles.findIndex(t => t === lifetime.role);
+      if (indx === -1) {
+        u.userRoles = u.userRoles.concat([lifetime.role]);
+        await this.userEntityRepository.save(u);
+        this.ebus.publish(new UserUpdatedEvent(u.asEntry()));
+      }
+    }
   }
 }

@@ -11,7 +11,7 @@ export class UserSaga {
   listenReactions = (events$: Observable<any>): Observable<ICommand> => {
     return events$.pipe(
       ofType(UserRolesUpdatedEvent),
-      map(t => new UpdateUserRolesCommand(t.id, t.roles)),
+      map(t => new UpdateUserRolesCommand(t.id, t.role, t.end_time)),
     );
   };
 }
