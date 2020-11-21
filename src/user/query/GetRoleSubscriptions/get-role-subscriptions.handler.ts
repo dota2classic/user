@@ -9,6 +9,7 @@ import { UserRoleLifetimeEntity } from 'src/user/model/user-role-lifetime.entity
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
+import { UserEntity } from 'src/user/model/user.entity';
 
 @QueryHandler(GetRoleSubscriptionsQuery)
 export class GetRoleSubscriptionsHandler
@@ -21,6 +22,8 @@ export class GetRoleSubscriptionsHandler
     private readonly userRoleLifetimeEntityRepository: Repository<
       UserRoleLifetimeEntity
     >,
+    @InjectRepository(UserEntity)
+    private readonly userEntityRepository: Repository<UserEntity>,
   ) {}
 
   async execute(
@@ -31,6 +34,7 @@ export class GetRoleSubscriptionsHandler
     const grouped: {
       [key: string]: UserRoleSummary;
     } = {};
+
 
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
