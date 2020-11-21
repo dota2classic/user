@@ -1,7 +1,10 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
 import { GetRoleSubscriptionsQuery } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions.query';
-import { GetRoleSubscriptionsQueryResult } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions-query.result';
+import {
+  GetRoleSubscriptionsQueryResult,
+  UserRoleSummary,
+} from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions-query.result';
 import { UserRoleLifetimeEntity } from 'src/user/model/user-role-lifetime.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,16 +26,29 @@ export class GetRoleSubscriptionsHandler
   async execute(
     command: GetRoleSubscriptionsQuery,
   ): Promise<GetRoleSubscriptionsQueryResult> {
-    const entries = await this.userRoleLifetimeEntityRepository
-      .find()
-      .then(items =>
-        items.map(item => ({
-          role: item.role,
-          end_time: item.end_time.getTime(),
-          playerId: new PlayerId(item.steam_id),
-        })),
-      );
+    const entries = await this.userRoleLifetimeEntityRepository.find();
 
-    return new GetRoleSubscriptionsQueryResult(entries);
+    const grouped: {
+      [key: string]: UserRoleSummary;
+    } = {};
+
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
+
+      let group = grouped[entry.steam_id];
+      if (!group) {
+        grouped[entry.steam_id] = new UserRoleSummary(entry.steam_id, []);
+      }
+
+      group.entries.push(this.mapEntry(entry));
+    }
+
+    return new GetRoleSubscriptionsQueryResult(Object.values(grouped));
   }
+
+  private mapEntry = (item: UserRoleLifetimeEntity) => ({
+    role: item.role,
+    end_time: item.end_time.getTime(),
+    playerId: new PlayerId(item.steam_id),
+  });
 }
