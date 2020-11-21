@@ -38,6 +38,7 @@ export class GetRoleSubscriptionsHandler
       let group = grouped[entry.steam_id];
       if (!group) {
         grouped[entry.steam_id] = new UserRoleSummary(entry.steam_id, []);
+        group = grouped[entry.steam_id];
       }
 
       group.entries.push(this.mapEntry(entry));
