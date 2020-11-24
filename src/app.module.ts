@@ -8,9 +8,17 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserProviders } from './user';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppService } from 'src/app.service';
+import { SentryModule } from '@ntegral/nestjs-sentry';
 
 @Module({
   imports: [
+    SentryModule.forRoot({
+      dsn:
+        "https://3c960c25469d4a7fa6cdefde695d4cae@o435989.ingest.sentry.io/5529899",
+      debug: false,
+      environment: isDev ? "dev" : "production",
+      logLevel: 2, //based on sentry.io loglevel //
+    }),
     CqrsModule,
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(

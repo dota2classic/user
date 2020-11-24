@@ -30,6 +30,7 @@
     "@nestjs/platform-express": "^7.0.0",
     "@nestjs/schedule": "^0.4.1",
     "@nestjs/typeorm": "^7.1.4",
+    "@ntegral/nestjs-sentry": "^1.0.4",
     "apisauce": "^2.0.0",
     "bignumber.js": "^9.0.1",
     "dotenv": "^8.2.0",
