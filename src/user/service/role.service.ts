@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from 'src/user/model/user.entity';
 import { EventBus } from '@nestjs/cqrs';
 import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
+import { UserRoleTimingsUpdateEvent } from 'src/gateway/events/user/user-role-timings-update.event';
 
 @Injectable()
 export class RoleService {
@@ -50,6 +51,7 @@ export class RoleService {
       await this.userEntityRepository.save(u);
 
       this.ebus.publish(new UserUpdatedEvent(u.asEntry()));
+      this.ebus.publish(new UserRoleTimingsUpdateEvent(u.asEntry()));
 
       await this.rlRep.delete(lifetime.id);
       this.logger.log(`Deleted expired lifetime`);
@@ -60,6 +62,7 @@ export class RoleService {
         u.userRoles = u.userRoles.concat([lifetime.role]);
         await this.userEntityRepository.save(u);
         this.ebus.publish(new UserUpdatedEvent(u.asEntry()));
+        this.ebus.publish(new UserRoleTimingsUpdateEvent(u.asEntry()));
       }
     }
   }
