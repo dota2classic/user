@@ -45,6 +45,7 @@ export class RoleService {
     }
 
     if (lifetime.isExpired) {
+      console.log('expired role ', lifetime.role)
       // if lifetime is expired, we need to remove role and delete lifetime
       u.userRoles = [...u.userRoles].filter(t => t !== lifetime.role);
 
@@ -53,8 +54,8 @@ export class RoleService {
       this.ebus.publish(new UserUpdatedEvent(u.asEntry()));
       this.ebus.publish(new UserRoleTimingsUpdateEvent(u.asEntry()));
 
-      await this.rlRep.delete(lifetime.id);
-      this.logger.log(`Deleted expired lifetime`);
+      // await this.rlRep.delete(lifetime.id);
+      this.logger.log(`Removed timed out role`);
     } else {
       // if its active, we make sure user has role
       const indx = u.userRoles.findIndex(t => t === lifetime.role);
