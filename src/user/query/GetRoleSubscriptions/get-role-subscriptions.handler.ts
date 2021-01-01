@@ -29,12 +29,16 @@ export class GetRoleSubscriptionsHandler
   async execute(
     command: GetRoleSubscriptionsQuery,
   ): Promise<GetRoleSubscriptionsQueryResult> {
-    const entries = await this.userRoleLifetimeEntityRepository.find();
+    let entries: UserRoleLifetimeEntity[] = [];
+    if (command.id)
+      entries = await this.userRoleLifetimeEntityRepository.find({
+        steam_id: command.id.value,
+      });
+    else entries = await this.userRoleLifetimeEntityRepository.find();
 
     const grouped: {
       [key: string]: UserRoleSummary;
     } = {};
-
 
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
