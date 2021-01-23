@@ -20,7 +20,7 @@ export class GetUserInfoHandler
   ) {}
 
 
-  @cached(10, GetUserInfoQuery.name)
+  @cached(100, GetUserInfoQuery.name)
   async execute(command: GetUserInfoQuery): Promise<GetUserInfoQueryResult> {
     const res = await this.userEntityRepository.findOne({
       steam_id: command.playerId.value,
