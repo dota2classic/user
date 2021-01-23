@@ -6,6 +6,8 @@ import { UserConnectionEntity } from '../../model/user-connection.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlayerId } from '../../../gateway/shared-types/player-id';
+import { cached } from 'src/util/cached';
+import { GetRoleSubscriptionsQuery } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions.query';
 
 @QueryHandler(GetByConnectionQuery)
 export class GetByConnectionHandler
@@ -19,6 +21,7 @@ export class GetByConnectionHandler
     >,
   ) {}
 
+  @cached(10, GetByConnectionQuery.name)
   async execute(
     command: GetByConnectionQuery,
   ): Promise<GetByConnectionQueryResult> {
