@@ -11,11 +11,13 @@ import { UserMightExistHandler } from 'src/user/event-handler/user-might-exist.h
 import { RoleService } from 'src/user/service/role.service';
 import { RoleLifetimeUpdatedHandler } from 'src/user/event-handler/role-lifetime-updated.handler';
 import { GetRoleSubscriptionsHandler } from 'src/user/query/GetRoleSubscriptions/get-role-subscriptions.handler';
+import { UserLoggedInHandler } from 'src/user/event-handler/user-logged-in.handler';
 
 const Sagas = [];
 const EventHandlers = [
   UserMightExistHandler,
-  RoleLifetimeUpdatedHandler
+  RoleLifetimeUpdatedHandler,
+  UserLoggedInHandler
 ];
 const Repositories = [];
 const QueryHandlers = [

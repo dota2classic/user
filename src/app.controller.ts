@@ -17,6 +17,7 @@ import { GetConnectionsQueryResult } from 'src/gateway/queries/GetConnections/ge
 import { UserMightExistEvent } from 'src/gateway/events/user/user-might-exist.event';
 import { GetRoleSubscriptionsQuery } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions.query';
 import { GetRoleSubscriptionsQueryResult } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions-query.result';
+import { UserLoggedInEvent } from './gateway/events/user/user-logged-in.event';
 
 @Controller()
 export class AppController {
@@ -81,5 +82,10 @@ export class AppController {
   @EventPattern(UserMightExistEvent.name)
   async UserMightExistEvent(query: UserMightExistEvent) {
     return this.ebus.publish(construct(UserMightExistEvent, query));
+  }
+
+  @EventPattern(UserLoggedInEvent.name)
+  async UserLoggedInEvent(query: UserLoggedInEvent) {
+    return this.ebus.publish(construct(UserLoggedInEvent, query));
   }
 }
