@@ -9,6 +9,7 @@ import { EventBus } from '@nestjs/cqrs';
 import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
 import { UserEntry } from 'src/gateway/queries/GetAll/get-all-query.result';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
+import { IS_SCALE_NODE } from 'src/config/env';
 
 const steamapi = create({
   baseURL: 'http://api.steampowered.com',
@@ -39,6 +40,7 @@ export class UserService {
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
+    if(IS_SCALE_NODE) return;
     this.logger.log(`Starting resolving names`);
     await this.usernameResolverTask();
     this.logger.log(`Resolved names`);

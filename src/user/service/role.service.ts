@@ -7,6 +7,7 @@ import { UserEntity } from 'src/user/model/user.entity';
 import { EventBus } from '@nestjs/cqrs';
 import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
 import { UserRoleTimingsUpdateEvent } from 'src/gateway/events/user/user-role-timings-update.event';
+import { IS_SCALE_NODE } from 'src/config/env';
 
 @Injectable()
 export class RoleService {
@@ -24,6 +25,7 @@ export class RoleService {
 
   @Cron(CronExpression.EVERY_HOUR)
   async checkRoles() {
+    if(IS_SCALE_NODE) return;
     this.logger.log(`Starting checking roles`);
     const lifetimes = await this.rlRep.find();
     for (let i = 0; i < lifetimes.length; i++) {

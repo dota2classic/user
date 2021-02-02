@@ -17,5 +17,7 @@ export const profile = process.env.PROFILE;
 export const isProd = profile === 'prod';
 export const isDev = !isProd;
 
+export const IS_SCALE_NODE = process.env.SCALET === 'true'
+
 
 export const HOST_PORT = process.env.USER_PORT
