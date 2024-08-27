@@ -19,6 +19,7 @@ export const devDbConfig: any = {
   entities: Entities,
   synchronize: true,
 
+
   keepConnectionAlive: true,
 };
 

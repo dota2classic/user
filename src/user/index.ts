@@ -12,6 +12,7 @@ import { RoleService } from 'src/user/service/role.service';
 import { RoleLifetimeUpdatedHandler } from 'src/user/event-handler/role-lifetime-updated.handler';
 import { GetRoleSubscriptionsHandler } from 'src/user/query/GetRoleSubscriptions/get-role-subscriptions.handler';
 import { UserLoggedInHandler } from 'src/user/event-handler/user-logged-in.handler';
+import { MigrationManager } from 'src/config/migrations/migration.manager';
 
 const Sagas = [];
 const EventHandlers = [
@@ -40,5 +41,6 @@ export const UserProviders = [
 
   UserSaga,
   UserService,
-  RoleService
+  RoleService,
+  MigrationManager,
 ];

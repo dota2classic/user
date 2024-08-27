@@ -17,7 +17,6 @@ export const profile = process.env.PROFILE;
 export const isProd = profile === 'prod';
 export const isDev = !isProd;
 
-console.log('is dev', profile)
 export const IS_SCALE_NODE = process.env.SCALET === 'true'
 
 
