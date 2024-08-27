@@ -18,6 +18,7 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice(AppModule, {
     transport: Transport.REDIS,
     options: {
+      url: REDIS_URL(),
       host: REDIS_HOST(),
       retryAttempts: Infinity,
       retryDelay: 5000,

@@ -26,8 +26,9 @@ export class GetUserInfoHandler
       where: { steam_id: command.playerId.value, }
     });
 
+    console.log('Before');
     this.ebus.publish(new UserMightExistEvent(command.playerId))
-
+    console.log('AFter');
     return new GetUserInfoQueryResult(command.playerId, res?.name || "", res?.avatar || "", res?.userRoles || []);
   }
 }
