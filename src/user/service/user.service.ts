@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { UserEntity } from 'src/user/model/user.entity';
 import { create } from 'apisauce';
 import { steam32to64, steam64to32 } from 'src/user/util/steamIds';
@@ -9,7 +9,7 @@ import { EventBus } from '@nestjs/cqrs';
 import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
 import { UserEntry } from 'src/gateway/queries/GetAll/get-all-query.result';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
-import { IS_SCALE_NODE } from 'src/config/env';
+import { IS_SCALE_NODE, STEAM_KEY } from 'src/config/env';
 
 const steamapi = create({
   baseURL: 'http://api.steampowered.com',
@@ -34,11 +34,15 @@ export class UserService {
     @InjectRepository(UserEntity)
     private readonly userEntityRepository: Repository<UserEntity>,
     private readonly ebus: EventBus,
+    private schedulerRegistry: SchedulerRegistry
   ) {
     // this.handleCron();
+    console.log(this.schedulerRegistry.getCronJobs())
   }
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_HOUR,{
+    name: "username resolve"
+  })
   async handleCron() {
     if(IS_SCALE_NODE) return;
     this.logger.log(`Starting resolving names`);
@@ -52,7 +56,7 @@ export class UserService {
     const res = await steamapi.get<any>(
       '/ISteamUser/GetPlayerSummaries/v0002',
       {
-        key: '5944065088CFEF1A24F74BE1C4C1E7AE',
+        key: STEAM_KEY(),
         steamids: steamIds,
       },
     );

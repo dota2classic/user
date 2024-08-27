@@ -13,7 +13,9 @@ export class UserLoggedInHandler implements IEventHandler<UserLoggedInEvent> {
 
   async handle(event: UserLoggedInEvent) {
     let u = await this.userEntityRepository.findOne({
-      steam_id: event.playerId.value,
+      where: {
+        steam_id: event.playerId.value,
+      }
     });
 
     if (!u) {

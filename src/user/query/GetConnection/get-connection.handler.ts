@@ -24,8 +24,8 @@ export class GetConnectionsHandler
     command: GetConnectionsQuery,
   ): Promise<GetConnectionsQueryResult> {
     const con = await this.urep.findOne({
-      steam_id: command.playerId.value,
-      connection: command.connection,
+      where: { steam_id: command.playerId.value,
+        connection: command.connection,}
     });
 
     if(!con) return;

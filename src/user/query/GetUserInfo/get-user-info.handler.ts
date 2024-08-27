@@ -23,7 +23,7 @@ export class GetUserInfoHandler
   @cached(100, GetUserInfoQuery.name)
   async execute(command: GetUserInfoQuery): Promise<GetUserInfoQueryResult> {
     const res = await this.userEntityRepository.findOne({
-      steam_id: command.playerId.value,
+      where: { steam_id: command.playerId.value, }
     });
 
     this.ebus.publish(new UserMightExistEvent(command.playerId))

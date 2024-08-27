@@ -1,4 +1,4 @@
-import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
 import { GetByConnectionQuery } from '../../../gateway/queries/GetByConnection/get-by-connection.query';
 import { GetByConnectionQueryResult } from '../../../gateway/queries/GetByConnection/get-by-connection-query.result';
@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlayerId } from '../../../gateway/shared-types/player-id';
 import { cached } from 'src/util/cached';
-import { GetRoleSubscriptionsQuery } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions.query';
 
 @QueryHandler(GetByConnectionQuery)
 export class GetByConnectionHandler
@@ -26,8 +25,10 @@ export class GetByConnectionHandler
     command: GetByConnectionQuery,
   ): Promise<GetByConnectionQueryResult> {
     const con = await this.userConnectionEntityRepository.findOne({
-      connection: command.connection,
-      external_id: command.externalId,
+      where :{
+        connection: command.connection,
+        external_id: command.externalId
+      }
     });
 
     if (con) return new GetByConnectionQueryResult(new PlayerId(con.steam_id));

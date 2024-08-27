@@ -14,7 +14,9 @@ export class UserMightExistHandler
 
   async handle(event: UserMightExistEvent) {
     const existing = await this.userEntityRepository.findOne({
-      steam_id: event.id.value,
+      where: {
+        steam_id: event.id.value,
+      }
     });
     if (!existing) {
       const u = new UserEntity();

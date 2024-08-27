@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { HOST_PORT, REDIS_PASSWORD, REDIS_URL } from './config/env';
+import { HOST_PORT, REDIS_HOST, REDIS_PASSWORD, REDIS_URL } from './config/env';
 import { Transport } from '@nestjs/microservices';
 import { CommandBus, EventBus, EventPublisher, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
@@ -18,7 +18,7 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice(AppModule, {
     transport: Transport.REDIS,
     options: {
-      url: REDIS_URL(),
+      host: REDIS_HOST(),
       retryAttempts: Infinity,
       retryDelay: 5000,
       password: REDIS_PASSWORD(),
@@ -33,30 +33,26 @@ async function bootstrap() {
   const elogger = new Logger('EventLogger');
   const qlogger = new Logger('QueryLogger');
 
-  ebus._subscribe(
-    new Subscriber<any>(e => {
+  ebus.subscribe(e => {
 
-      elogger.log(
-        // `${inspect(e)}`,
-        e.__proto__.constructor.name,
-      );
-    }),
-  );
+    elogger.log(
+      // `${inspect(e)}`,
+      e.constructor.name,
+    );
+  })
 
 
-  cbus._subscribe(
-    new Subscriber<any>(e => {
-      clogger.log(`${inspect(e)}, ${e.__proto__.constructor.name}`);
-    }),
-  );
+  cbus.subscribe(e => {
+    clogger.log(`${inspect(e)}, ${e.constructor.name}`);
+  })
 
-  qbus._subscribe(
-    new Subscriber<any>(e => {
-      qlogger.log(e.__proto__.constructor.name);
-    }),
-  );
+  qbus.subscribe(e => {
+    qlogger.log(e.constructor.name);
+  })
 
-  await app.listenAsync();
+
+  await app.listen();
+
 
   const publisher = app.get(EventPublisher);
   prepareModels(publisher);

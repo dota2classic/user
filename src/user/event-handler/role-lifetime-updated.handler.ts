@@ -18,8 +18,10 @@ export class RoleLifetimeUpdatedHandler
 
   async handle(event: RoleLifetimeUpdatedEvent) {
     const lft = await this.userRoleLifetimeEntityRepository.findOne({
-      steam_id: event.steam_id,
-      role: event.role,
+      where: {
+        steam_id: event.steam_id,
+        role: event.role,
+      }
     });
     if (!lft) return;
     await this.roleService.check(lft);

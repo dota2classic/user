@@ -35,7 +35,7 @@ export class GetRoleSubscriptionsHandler
     let entries: UserRoleLifetimeEntity[] = [];
     if (command.id)
       entries = await this.userRoleLifetimeEntityRepository.find({
-        steam_id: command.id.value,
+        where: { steam_id: command.id.value, }
       });
     else entries = await this.userRoleLifetimeEntityRepository.find();
 

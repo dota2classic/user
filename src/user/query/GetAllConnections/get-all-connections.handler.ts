@@ -27,7 +27,9 @@ export class GetAllConnectionsHandler
     command: GetAllConnectionsQuery,
   ): Promise<GetAllConnectionsQueryResult> {
     const allEntries = await this.userConnectionEntityRepository.find({
-      connection: command.connection,
+      where: {
+        connection: command.connection,
+      }
     });
     return new GetAllConnectionsQueryResult(
       allEntries.map(

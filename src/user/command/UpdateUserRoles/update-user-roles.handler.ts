@@ -24,8 +24,10 @@ export class UpdateUserRolesHandler
 
   async execute(command: UpdateUserRolesCommand) {
     let r = await this.userRoleLifetimeEntityRepository.findOne({
-      steam_id: command.id.value,
-      role: command.role,
+      where: {
+        steam_id: command.id.value,
+        role: command.role,
+      }
     });
 
     if (!r) {

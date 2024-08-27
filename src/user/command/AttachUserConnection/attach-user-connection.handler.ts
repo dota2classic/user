@@ -26,7 +26,9 @@ export class AttachUserConnectionHandler
 
   async execute(command: AttachUserConnectionCommand) {
     let u = await this.userEntityRepository.findOne({
-      steam_id: command.playerId.value,
+      where: {
+        steam_id: command.playerId.value,
+      }
     });
     if (!u) {
       u = new UserEntity();
@@ -38,8 +40,10 @@ export class AttachUserConnectionHandler
 
     const existingConnection = await this.userConnectionEntityRepository.findOne(
       {
-        connection: command.connection,
-        external_id: command.externalId,
+        where: {
+          connection: command.connection,
+          external_id: command.externalId,
+        }
       },
     );
 
@@ -56,8 +60,10 @@ export class AttachUserConnectionHandler
     }
 
     let con = await this.userConnectionEntityRepository.findOne({
-      connection: command.connection,
-      steam_id: command.playerId.value,
+      where:{
+        connection: command.connection,
+        steam_id: command.playerId.value,
+      }
     });
 
     if (con) await this.userConnectionEntityRepository.delete(con);

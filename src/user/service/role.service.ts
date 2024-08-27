@@ -23,7 +23,9 @@ export class RoleService {
     this.checkRoles();
   }
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_HOUR, {
+    name: 'Check roles'
+  })
   async checkRoles() {
     if(IS_SCALE_NODE) return;
     this.logger.log(`Starting checking roles`);
@@ -37,7 +39,7 @@ export class RoleService {
 
   public async check(lifetime: UserRoleLifetimeEntity) {
     let u = await this.userEntityRepository.findOne({
-      steam_id: lifetime.steam_id,
+      where: { steam_id: lifetime.steam_id,}
     });
 
     if (!u) {
