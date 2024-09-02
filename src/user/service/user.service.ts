@@ -61,8 +61,6 @@ export class UserService {
       },
     );
 
-    console.log(res.data!!.response.players);
-
     return res.data!!.response.players;
   }
 
