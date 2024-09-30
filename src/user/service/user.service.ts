@@ -50,8 +50,56 @@ export class UserService {
     this.logger.log(`Resolved names`);
   }
 
+  public async usernameResolverTask() {
+    // Use empty first
+    // const players = (await this.userEntityRepository.find()).sort((a,b) => {
+    //   return (a.name.length === 0 ? -100000 : 0) - (b.name.length === 0 ? -100000 : 0)
+    // } );
+
+    const chunkSize = 100;
+
+    const players = await this.userEntityRepository
+      .createQueryBuilder('ue')
+      .orderBy('updated_at', 'ASC', 'NULLS FIRST')
+      .take(chunkSize)
+      .getMany();
+
+    try {
+      const profiles = await this.getUsernames(players);
+
+      // Intersection
+
+      profiles.forEach((prof) => {
+        const steam_32 = steam64to32(prof.steamid);
+        const player = players.find((t) => t.steam_id === steam_32);
+        if (player) {
+          player.name = prof.personaname;
+          player.avatar = prof.avatarfull;
+          player.updated_at = new Date();
+          // console.log(player)
+
+          this.ebus.publish(
+            new UserUpdatedEvent(
+              new UserEntry(
+                new PlayerId(steam_32),
+                player.name,
+                player.avatar,
+                player.userRoles,
+              ),
+            ),
+          );
+        }
+      });
+      await this.userEntityRepository.save(players);
+
+      this.logger.log(`Updated ${players.length} profiles`);
+    } catch (e) {
+      this.logger.error('Rate limit hit, skipping cron task...');
+    }
+  }
+
   private async getUsernames(players: UserEntity[]): Promise<SteamProfile[]> {
-    const steamIds = players.map(t => steam32to64(t.steam_id)).join(',');
+    const steamIds = players.map((t) => steam32to64(t.steam_id)).join(',');
 
     const res = await steamapi.get<any>(
       '/ISteamUser/GetPlayerSummaries/v0002',
@@ -63,68 +111,4 @@ export class UserService {
 
     return res.data!!.response.players;
   }
-
-  public async usernameResolverTask() {
-                                        // Use empty first
-                                        // const players = (await this.userEntityRepository.find()).sort((a,b) => {
-                                        //   return (a.name.length === 0 ? -100000 : 0) - (b.name.length === 0 ? -100000 : 0)
-                                        // } );
-
-                                        const chunkSize = 100;
-
-                                        const players = await this.userEntityRepository
-                                          .createQueryBuilder('ue')
-                                          .orderBy(
-                                            'updated_at',
-                                            'ASC',
-                                            'NULLS FIRST',
-                                          )
-                                          .take(chunkSize)
-                                          .getMany();
-
-                                        try {
-                                          const profiles = await this.getUsernames(
-                                            players,
-                                          );
-
-                                          // Intersection
-
-                                          profiles.forEach(prof => {
-                                            const steam_32 = steam64to32(
-                                              prof.steamid,
-                                            );
-                                            const player = players.find(
-                                              t => t.steam_id === steam_32,
-                                            );
-                                            if (player) {
-                                              player.name = prof.personaname;
-                                              player.avatar = prof.avatarfull;
-                                              player.updated_at = new Date();
-                                              // console.log(player)
-
-                                              this.ebus.publish(
-                                                new UserUpdatedEvent(
-                                                  new UserEntry(
-                                                    new PlayerId(steam_32),
-                                                    player.name,
-                                                    player.avatar,
-                                                    player.userRoles,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          });
-                                          await this.userEntityRepository.save(
-                                            players,
-                                          );
-
-                                          this.logger.log(
-                                            `Updated ${players.length} profiles`,
-                                          );
-                                        } catch (e) {
-                                          this.logger.error(
-                                            'Rate limit hit, skipping cron task...',
-                                          );
-                                        }
-                                      }
 }
