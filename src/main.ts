@@ -1,6 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { HOST_PORT, REDIS_HOST, REDIS_PASSWORD, REDIS_URL } from './config/env';
+import {
+  HOST_PORT,
+  IS_SCALE_NODE,
+  REDIS_HOST,
+  REDIS_PASSWORD,
+  REDIS_URL,
+} from './config/env';
 import { Transport } from '@nestjs/microservices';
 import { CommandBus, EventBus, EventPublisher, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
@@ -53,6 +59,10 @@ async function bootstrap() {
 
 
   await app.listen();
+
+  clogger.log(
+    `Starter user service as ${IS_SCALE_NODE ? 'Scale node' : 'Ma;in node'}`,
+  );
 
 
   const publisher = app.get(EventPublisher);

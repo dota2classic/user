@@ -17,6 +17,9 @@ export class UserEntity extends AggregateRoot {
   @Column({ nullable: true })
   avatar: string;
 
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  updated_at: Date;
+
   @Column('varchar', { default: `${Role.PLAYER}` })
   private roles: string = '';
 
@@ -52,7 +55,7 @@ export class UserEntity extends AggregateRoot {
       new PlayerId(this.steam_id),
       this.name,
       this.avatar,
-      this.userRoles
-    )
+      this.userRoles,
+    );
   }
 }

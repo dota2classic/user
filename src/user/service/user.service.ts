@@ -34,17 +34,17 @@ export class UserService {
     @InjectRepository(UserEntity)
     private readonly userEntityRepository: Repository<UserEntity>,
     private readonly ebus: EventBus,
-    private schedulerRegistry: SchedulerRegistry
+    private schedulerRegistry: SchedulerRegistry,
   ) {
-    // this.handleCron();
-    console.log(this.schedulerRegistry.getCronJobs())
+    this.handleCron();
+    console.log(this.schedulerRegistry.getCronJobs());
   }
 
-  @Cron(CronExpression.EVERY_HOUR,{
-    name: "username resolve"
+  @Cron(CronExpression.EVERY_MINUTE, {
+    name: 'username resolve',
   })
   async handleCron() {
-    if(IS_SCALE_NODE) return;
+    if (IS_SCALE_NODE) return;
     this.logger.log(`Starting resolving names`);
     await this.usernameResolverTask();
     this.logger.log(`Resolved names`);
@@ -65,34 +65,66 @@ export class UserService {
   }
 
   public async usernameResolverTask() {
-    const players = await this.userEntityRepository.find();
+                                        // Use empty first
+                                        // const players = (await this.userEntityRepository.find()).sort((a,b) => {
+                                        //   return (a.name.length === 0 ? -100000 : 0) - (b.name.length === 0 ? -100000 : 0)
+                                        // } );
 
-    for (let i = 0; i < players.length / 100; i++) {
-      const profiles = await this.getUsernames(
-        players.slice(i * 100, (i + 1) * 100),
-      );
+                                        const chunkSize = 100;
 
-      profiles.forEach(prof => {
-        const steam_32 = steam64to32(prof.steamid);
-        const player = players.find(t => t.steam_id === steam_32);
-        if (player) {
-          player.name = prof.personaname;
-          player.avatar = prof.avatarfull;
+                                        const players = await this.userEntityRepository
+                                          .createQueryBuilder('ue')
+                                          .orderBy(
+                                            'updated_at',
+                                            'ASC',
+                                            'NULLS FIRST',
+                                          )
+                                          .take(chunkSize)
+                                          .getMany();
 
-          this.ebus.publish(
-            new UserUpdatedEvent(
-              new UserEntry(
-                new PlayerId(steam_32),
-                player.name,
-                player.avatar,
-                player.userRoles,
-              ),
-            ),
-          );
-        }
-      });
-    }
+                                        try {
+                                          const profiles = await this.getUsernames(
+                                            players,
+                                          );
 
-    await this.userEntityRepository.save(players);
-  }
+                                          // Intersection
+
+                                          profiles.forEach(prof => {
+                                            const steam_32 = steam64to32(
+                                              prof.steamid,
+                                            );
+                                            const player = players.find(
+                                              t => t.steam_id === steam_32,
+                                            );
+                                            if (player) {
+                                              player.name = prof.personaname;
+                                              player.avatar = prof.avatarfull;
+                                              player.updated_at = new Date();
+                                              // console.log(player)
+
+                                              this.ebus.publish(
+                                                new UserUpdatedEvent(
+                                                  new UserEntry(
+                                                    new PlayerId(steam_32),
+                                                    player.name,
+                                                    player.avatar,
+                                                    player.userRoles,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          });
+                                          await this.userEntityRepository.save(
+                                            players,
+                                          );
+
+                                          this.logger.log(
+                                            `Updated ${players.length} profiles`,
+                                          );
+                                        } catch (e) {
+                                          this.logger.error(
+                                            'Rate limit hit, skipping cron task...',
+                                          );
+                                        }
+                                      }
 }
