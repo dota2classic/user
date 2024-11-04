@@ -40,7 +40,7 @@ export class UserService {
     console.log(this.schedulerRegistry.getCronJobs());
   }
 
-  @Cron(CronExpression.EVERY_MINUTE, {
+  @Cron(CronExpression.EVERY_10_MINUTES, {
     name: 'username resolve',
   })
   async handleCron() {
