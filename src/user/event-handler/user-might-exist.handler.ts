@@ -20,6 +20,7 @@ export class UserMightExistHandler
     });
     if (!existing) {
       const u = new UserEntity();
+      u.created_at = new Date();
       u.steam_id = event.id.value;
       await this.userEntityRepository.save(u);
     }

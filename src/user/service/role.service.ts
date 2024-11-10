@@ -45,6 +45,7 @@ export class RoleService {
     if (!u) {
       u = new UserEntity();
       u.steam_id = lifetime.steam_id;
+      u.created_at = new Date();
       await this.userEntityRepository.save(u);
     }
 

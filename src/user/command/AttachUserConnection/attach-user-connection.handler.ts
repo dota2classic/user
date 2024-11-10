@@ -33,6 +33,7 @@ export class AttachUserConnectionHandler
     if (!u) {
       u = new UserEntity();
       u.steam_id = command.playerId.value;
+      u.created_at = new Date();
       await this.userEntityRepository.save(u);
       u.created();
       u.commit();

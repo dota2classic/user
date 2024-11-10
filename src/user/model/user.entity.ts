@@ -18,6 +18,9 @@ export class UserEntity extends AggregateRoot {
   avatar: string;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
+  created_at: Date;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
   updated_at: Date;
 
   @Column('varchar', { default: `${Role.PLAYER}` })

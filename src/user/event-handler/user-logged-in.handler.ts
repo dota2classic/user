@@ -15,7 +15,7 @@ export class UserLoggedInHandler implements IEventHandler<UserLoggedInEvent> {
     let u = await this.userEntityRepository.findOne({
       where: {
         steam_id: event.playerId.value,
-      }
+      },
     });
 
     if (!u) {
@@ -23,6 +23,7 @@ export class UserLoggedInHandler implements IEventHandler<UserLoggedInEvent> {
       u.steam_id = event.playerId.value;
       u.name = event.name;
       u.avatar = event.avatar;
+      u.created_at = new Date();
       u.userRoles = [];
       await this.userEntityRepository.save(u);
       u.created();
