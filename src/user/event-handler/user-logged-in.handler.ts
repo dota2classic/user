@@ -28,6 +28,7 @@ export class UserLoggedInHandler implements IEventHandler<UserLoggedInEvent> {
       u.name = event.name;
       u.avatar = event.avatar;
       u.created_at = new Date();
+      u.referral = event.referral;
       u.userRoles = [];
       await this.userEntityRepository.save(u);
       this.ebus.publish(new UserCreatedEvent(new PlayerId(u.steam_id)));

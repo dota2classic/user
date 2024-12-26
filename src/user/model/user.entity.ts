@@ -17,6 +17,9 @@ export class UserEntity extends AggregateRoot {
   @Column({ nullable: true })
   avatar: string;
 
+  @Column({ nullable: true })
+  referral?: string;
+
   @Column({ type: 'timestamp with time zone', nullable: true })
   created_at: Date;
 
