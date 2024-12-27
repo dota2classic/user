@@ -3,7 +3,6 @@ import { UserLoggedInEvent } from 'src/gateway/events/user/user-logged-in.event'
 import { UserEntity } from 'src/user/model/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
 import { UserCreatedEvent } from 'src/gateway/events/user/user-created.event';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
 import { UserUpdatedInnerEvent } from 'src/user/event/user-updated-inner.event';
@@ -35,6 +34,10 @@ export class UserLoggedInHandler implements IEventHandler<UserLoggedInEvent> {
     } else {
       u.name = event.name;
       u.avatar = event.avatar;
+      // What if user was created by opening profile? We need to set referral after all
+      if (!u.referral) {
+        u.referral = event.referral;
+      }
       await this.userEntityRepository.save(u);
     }
 
