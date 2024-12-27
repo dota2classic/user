@@ -28,15 +28,15 @@ export class UserLoggedInHandler implements IEventHandler<UserLoggedInEvent> {
       u.name = event.name;
       u.avatar = event.avatar;
       u.created_at = new Date();
-      u.referral = event.referral;
+      u.referral = event.referral || null;
       await this.userEntityRepository.save(u);
       this.ebus.publish(new UserCreatedEvent(new PlayerId(u.steam_id)));
     } else {
       u.name = event.name;
       u.avatar = event.avatar;
       // What if user was created by opening profile? We need to set referral after all
-      if (!u.referral) {
-        u.referral = event.referral;
+      if (!u.referral && event.referral) {
+        u.referral = event.referral || null;
       }
       await this.userEntityRepository.save(u);
     }
