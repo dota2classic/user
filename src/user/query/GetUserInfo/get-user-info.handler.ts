@@ -6,7 +6,6 @@ import { UserEntity } from 'src/user/model/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserMightExistEvent } from 'src/gateway/events/user/user-might-exist.event';
-import { cached } from 'src/util/cached';
 
 @QueryHandler(GetUserInfoQuery)
 export class GetUserInfoHandler

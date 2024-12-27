@@ -13,16 +13,17 @@ export class UserMightExistHandler
   ) {}
 
   async handle(event: UserMightExistEvent) {
-    const existing = await this.userEntityRepository.findOne({
-      where: {
-        steam_id: event.id.value,
-      }
-    });
-    if (!existing) {
-      const u = new UserEntity();
-      u.created_at = new Date();
-      u.steam_id = event.id.value;
-      await this.userEntityRepository.save(u);
-    }
+    // I dont think i want this
+    // const existing = await this.userEntityRepository.findOne({
+    //   where: {
+    //     steam_id: event.id.value,
+    //   }
+    // });
+    // if (!existing) {
+    //   const u = new UserEntity();
+    //   u.created_at = new Date();
+    //   u.steam_id = event.id.value;
+    //   await this.userEntityRepository.save(u);
+    // }
   }
 }
