@@ -1,4 +1,4 @@
-import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { EventBus, EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { UserUpdatedInnerEvent } from 'src/user/event/user-updated-inner.event';
 import { UserEntity } from 'src/user/model/user.entity';
 import { Repository } from 'typeorm';
@@ -17,6 +17,7 @@ export class UserUpdatedInnerHandler
     private readonly userEntityRepository: Repository<UserEntity>,
     @InjectRepository(UserRoleLifetimeEntity)
     private readonly userRoleLifetimeEntityRepository: Repository<UserRoleLifetimeEntity>,
+    private readonly ebus: EventBus,
   ) {}
 
   async handle(event: UserUpdatedInnerEvent) {
@@ -24,12 +25,14 @@ export class UserUpdatedInnerHandler
       where: { steam_id: event.steamId },
     });
 
-    new UserUpdatedEvent(
-      new UserEntry(
-        new PlayerId(event.steamId),
-        user.name,
-        user.avatar,
-        user.activeRoles,
+    this.ebus.publish(
+      new UserUpdatedEvent(
+        new UserEntry(
+          new PlayerId(event.steamId),
+          user.name,
+          user.avatar,
+          user.activeRoles,
+        ),
       ),
     );
   }
