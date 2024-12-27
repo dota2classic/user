@@ -1,10 +1,9 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { Role } from 'src/gateway/shared-types/roles';
+import { Column, Entity, OneToMany, PrimaryColumn, Relation } from 'typeorm';
 import { AggregateRoot } from '@nestjs/cqrs';
-import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
-import { UserEntry } from 'src/gateway/queries/GetAll/get-all-query.result';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
 import { UserCreatedEvent } from 'src/gateway/events/user/user-created.event';
+import { UserRoleLifetimeEntity } from 'src/user/model/user-role-lifetime.entity';
+import { Role } from 'src/gateway/shared-types/roles';
 
 @Entity()
 export class UserEntity extends AggregateRoot {
@@ -26,42 +25,16 @@ export class UserEntity extends AggregateRoot {
   @Column({ type: 'timestamp with time zone', nullable: true })
   updated_at: Date;
 
-  @Column('varchar', { default: `${Role.PLAYER}` })
-  private roles: string = '';
+  @OneToMany((type) => UserRoleLifetimeEntity, (t) => t.user, {
+    eager: true,
+  })
+  roles: Relation<UserRoleLifetimeEntity>[];
 
-  public get userRoles(): Role[] {
-    return this.roles.split(',') as Role[];
-  }
-
-  public set userRoles(r: Role[]) {
-    this.roles = r
-      .filter((value, index, self) => self.indexOf(value) === index)
-      .join(',');
-  }
-
-  public updated() {
-    this.publish(
-      new UserUpdatedEvent(
-        new UserEntry(
-          new PlayerId(this.steam_id),
-          this.name,
-          this.avatar,
-          this.userRoles,
-        ),
-      ),
-    );
+  public get activeRoles(): Role[] {
+    return this.roles.filter((t) => !t.isExpired).map((it) => it.role);
   }
 
   public created() {
     this.publish(new UserCreatedEvent(new PlayerId(this.steam_id)));
-  }
-
-  public asEntry(): UserEntry {
-    return new UserEntry(
-      new PlayerId(this.steam_id),
-      this.name,
-      this.avatar,
-      this.userRoles,
-    );
   }
 }

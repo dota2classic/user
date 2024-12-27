@@ -1,4 +1,4 @@
-import { QueryHandler, IQueryHandler, EventBus } from '@nestjs/cqrs';
+import { EventBus, IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
 import { GetUserInfoQuery } from 'src/gateway/queries/GetUserInfo/get-user-info.query';
 import { GetUserInfoQueryResult } from 'src/gateway/queries/GetUserInfo/get-user-info-query.result';
@@ -10,23 +10,28 @@ import { cached } from 'src/util/cached';
 
 @QueryHandler(GetUserInfoQuery)
 export class GetUserInfoHandler
-  implements IQueryHandler<GetUserInfoQuery, GetUserInfoQueryResult> {
+  implements IQueryHandler<GetUserInfoQuery, GetUserInfoQueryResult>
+{
   private readonly logger = new Logger(GetUserInfoHandler.name);
 
   constructor(
     @InjectRepository(UserEntity)
     private readonly userEntityRepository: Repository<UserEntity>,
-    private readonly ebus: EventBus
+    private readonly ebus: EventBus,
   ) {}
-
 
   @cached(100, GetUserInfoQuery.name)
   async execute(command: GetUserInfoQuery): Promise<GetUserInfoQueryResult> {
     const res = await this.userEntityRepository.findOne({
-      where: { steam_id: command.playerId.value, }
+      where: { steam_id: command.playerId.value },
     });
 
-    this.ebus.publish(new UserMightExistEvent(command.playerId))
-    return new GetUserInfoQueryResult(command.playerId, res?.name || "", res?.avatar || "", res?.userRoles || []);
+    this.ebus.publish(new UserMightExistEvent(command.playerId));
+    return new GetUserInfoQueryResult(
+      command.playerId,
+      res?.name || '',
+      res?.avatar || '',
+      res?.activeRoles || [],
+    );
   }
 }

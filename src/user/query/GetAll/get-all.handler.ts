@@ -25,12 +25,12 @@ export class GetAllHandler
 
     return new GetAllQueryResult(
       all.map(
-        t =>
+        (t) =>
           new UserEntry(
             new PlayerId(t.steam_id),
             t.name,
             t.avatar,
-            t.userRoles,
+            t.activeRoles,
           ),
       ),
     );

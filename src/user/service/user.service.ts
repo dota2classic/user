@@ -6,10 +6,8 @@ import { steam32to64, steam64to32 } from 'src/user/util/steamIds';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EventBus } from '@nestjs/cqrs';
-import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
-import { UserEntry } from 'src/gateway/queries/GetAll/get-all-query.result';
-import { PlayerId } from 'src/gateway/shared-types/player-id';
 import { IS_SCALE_NODE, STEAM_KEY } from 'src/config/env';
+import { UserUpdatedInnerEvent } from 'src/user/event/user-updated-inner.event';
 
 const steamapi = create({
   baseURL: 'http://api.steampowered.com',
@@ -76,21 +74,13 @@ export class UserService {
           player.name = prof.personaname;
           player.avatar = prof.avatarfull;
           player.updated_at = new Date();
-          // console.log(player)
-
-          this.ebus.publish(
-            new UserUpdatedEvent(
-              new UserEntry(
-                new PlayerId(steam_32),
-                player.name,
-                player.avatar,
-                player.userRoles,
-              ),
-            ),
-          );
         }
       });
       await this.userEntityRepository.save(players);
+
+      this.ebus.publishAll(
+        players.map((it) => new UserUpdatedInnerEvent(it.steam_id)),
+      );
 
       this.logger.log(`Updated ${players.length} profiles`);
     } catch (e) {

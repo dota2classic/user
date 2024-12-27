@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
 import { UserCreatedEvent } from 'src/gateway/events/user/user-created.event';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
+import { UserUpdatedInnerEvent } from 'src/user/event/user-updated-inner.event';
 
 @EventsHandler(UserLoggedInEvent)
 export class UserLoggedInHandler implements IEventHandler<UserLoggedInEvent> {
@@ -29,7 +30,6 @@ export class UserLoggedInHandler implements IEventHandler<UserLoggedInEvent> {
       u.avatar = event.avatar;
       u.created_at = new Date();
       u.referral = event.referral;
-      u.userRoles = [];
       await this.userEntityRepository.save(u);
       this.ebus.publish(new UserCreatedEvent(new PlayerId(u.steam_id)));
     } else {
@@ -38,6 +38,6 @@ export class UserLoggedInHandler implements IEventHandler<UserLoggedInEvent> {
       await this.userEntityRepository.save(u);
     }
 
-    this.ebus.publish(new UserUpdatedEvent(u.asEntry()));
+    this.ebus.publish(new UserUpdatedInnerEvent(u.steam_id));
   }
 }

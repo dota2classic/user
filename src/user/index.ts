@@ -8,17 +8,18 @@ import { UpdateUserRolesHandler } from 'src/user/command/UpdateUserRoles/update-
 import { UserSaga } from 'src/user/saga/user.saga';
 import { GetConnectionsHandler } from 'src/user/query/GetConnection/get-connection.handler';
 import { UserMightExistHandler } from 'src/user/event-handler/user-might-exist.handler';
-import { RoleService } from 'src/user/service/role.service';
 import { RoleLifetimeUpdatedHandler } from 'src/user/event-handler/role-lifetime-updated.handler';
 import { GetRoleSubscriptionsHandler } from 'src/user/query/GetRoleSubscriptions/get-role-subscriptions.handler';
 import { UserLoggedInHandler } from 'src/user/event-handler/user-logged-in.handler';
 import { MigrationManager } from 'src/config/migrations/migration.manager';
+import { UserUpdatedInnerHandler } from 'src/user/event-handler/user-updated-inner.handler';
 
 const Sagas = [];
 const EventHandlers = [
   UserMightExistHandler,
   RoleLifetimeUpdatedHandler,
-  UserLoggedInHandler
+  UserLoggedInHandler,
+  UserUpdatedInnerHandler,
 ];
 const Repositories = [];
 const QueryHandlers = [
@@ -28,7 +29,7 @@ const QueryHandlers = [
   GetUserInfoHandler,
   GetConnectionsHandler,
   UpdateUserRolesHandler,
-  GetRoleSubscriptionsHandler
+  GetRoleSubscriptionsHandler,
 ];
 const CommandHandlers = [AttachUserConnectionHandler, UpdateUserRolesHandler];
 export const UserProviders = [
@@ -38,9 +39,7 @@ export const UserProviders = [
   ...Repositories,
   ...QueryHandlers,
 
-
   UserSaga,
   UserService,
-  RoleService,
   MigrationManager,
 ];
