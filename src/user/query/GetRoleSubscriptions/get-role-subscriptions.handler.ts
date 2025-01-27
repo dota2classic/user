@@ -10,8 +10,6 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
 import { UserEntity } from 'src/user/model/user.entity';
-import { cached } from 'src/util/cached';
-import { GetConnectionsQuery } from 'src/gateway/queries/GetConnections/get-connections.query';
 
 @QueryHandler(GetRoleSubscriptionsQuery)
 export class GetRoleSubscriptionsHandler
@@ -28,7 +26,6 @@ export class GetRoleSubscriptionsHandler
     private readonly userEntityRepository: Repository<UserEntity>,
   ) {}
 
-  @cached(10, GetRoleSubscriptionsQuery.name)
   async execute(
     command: GetRoleSubscriptionsQuery,
   ): Promise<GetRoleSubscriptionsQueryResult> {

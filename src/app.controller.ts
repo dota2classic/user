@@ -18,7 +18,7 @@ import { UserMightExistEvent } from 'src/gateway/events/user/user-might-exist.ev
 import { GetRoleSubscriptionsQuery } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions.query';
 import { GetRoleSubscriptionsQueryResult } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions-query.result';
 import { UserLoggedInEvent } from './gateway/events/user/user-logged-in.event';
-import { IS_SCALE_NODE } from 'src/config/env';
+import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class AppController {
@@ -26,6 +26,7 @@ export class AppController {
     private readonly qbus: QueryBus,
     private readonly cbus: CommandBus,
     private readonly ebus: EventBus,
+    private readonly config: ConfigService,
   ) {}
 
   @MessagePattern(GetByConnectionQuery.name)
@@ -77,19 +78,19 @@ export class AppController {
 
   @EventPattern(UserRolesUpdatedEvent.name)
   async UserRolesUpdatedEvent(query: UserRolesUpdatedEvent) {
-    if(IS_SCALE_NODE) return;
+    if (this.config.get('scalet') === 'true') return;
     return this.ebus.publish(construct(UserRolesUpdatedEvent, query));
   }
 
   @EventPattern(UserMightExistEvent.name)
   async UserMightExistEvent(query: UserMightExistEvent) {
-    if(IS_SCALE_NODE) return;
+    if (this.config.get('scalet') === 'true') return;
     return this.ebus.publish(construct(UserMightExistEvent, query));
   }
 
   @EventPattern(UserLoggedInEvent.name)
   async UserLoggedInEvent(query: UserLoggedInEvent) {
-    if(IS_SCALE_NODE) return;
+    if (this.config.get('scalet') === 'true') return;
     return this.ebus.publish(construct(UserLoggedInEvent, query));
   }
 }

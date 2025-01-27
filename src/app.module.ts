@@ -2,12 +2,13 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { devDbConfig, Entities, prodDbConfig } from './config/typeorm.config';
-import { isDev, REDIS_HOST, REDIS_PASSWORD, REDIS_URL } from './config/env';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { Entities } from './config/typeorm.config';
+import { ClientsModule, RedisOptions, Transport } from '@nestjs/microservices';
 import { UserProviders } from './user';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppService } from 'src/app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import configuration from 'src/config/configuration';
 
 @Module({
   imports: [
@@ -18,30 +19,50 @@ import { AppService } from 'src/app.service';
     //   environment: isDev ? "dev" : "production",
     //   logLevel: 2, //based on sentry.io loglevel //
     // }),
+    ConfigModule.forRoot({
+      load: [configuration],
+      isGlobal: true,
+    }),
     CqrsModule,
     ScheduleModule.forRoot(),
-    TypeOrmModule.forRoot(
-      (isDev ? devDbConfig : prodDbConfig) as TypeOrmModuleOptions,
-    ),
+    TypeOrmModule.forRootAsync({
+      useFactory(config: ConfigService): TypeOrmModuleOptions {
+        return {
+          type: 'postgres',
+          database: 'postgres',
+          host: config.get('postgres.host'),
+          port: 5432,
+          username: config.get('postgres.username'),
+          password: config.get('postgres.password'),
+          entities: Entities,
+          synchronize: true,
+          dropSchema: false,
+
+          ssl: false,
+        };
+      },
+      imports: [],
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forFeature(Entities),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'QueryCore',
-        transport: Transport.REDIS,
-        options: {
-          url: REDIS_URL(),
-          host: REDIS_HOST(),
-          retryAttempts: Infinity,
-          retryDelay: 5000,
-          password: REDIS_PASSWORD(),
+        useFactory(config: ConfigService): RedisOptions {
+          return {
+            transport: Transport.REDIS,
+            options: {
+              host: config.get('redis.host'),
+              password: config.get('redis.password'),
+            },
+          };
         },
+        inject: [ConfigService],
+        imports: [],
       },
-    ] as any),
+    ]),
   ],
   controllers: [AppController],
-  providers: [
-    ...UserProviders,
-    AppService
-  ],
+  providers: [...UserProviders, AppService],
 })
 export class AppModule {}

@@ -1,19 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {
-  HOST_PORT,
-  IS_SCALE_NODE,
-  REDIS_HOST,
-  REDIS_PASSWORD,
-  REDIS_URL,
-} from './config/env';
 import { Transport } from '@nestjs/microservices';
 import { CommandBus, EventBus, EventPublisher, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
-import { Subscriber } from 'rxjs';
 import { UserEntity } from 'src/user/model/user.entity';
 import { inspect } from 'util';
-import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
+import configuration from 'src/config/configuration';
+import { ConfigService } from '@nestjs/config';
 
 export function prepareModels(publisher: EventPublisher) {
   //
@@ -21,14 +14,15 @@ export function prepareModels(publisher: EventPublisher) {
 }
 
 async function bootstrap() {
+  const config = new ConfigService(configuration());
+
   const app = await NestFactory.createMicroservice(AppModule, {
     transport: Transport.REDIS,
     options: {
-      url: REDIS_URL(),
-      host: REDIS_HOST(),
-      retryAttempts: Infinity,
-      retryDelay: 5000,
-      password: REDIS_PASSWORD(),
+      retryAttempts: 3,
+      retryDelay: 3000,
+      password: config.get('redis.password'),
+      host: config.get('redis.host'),
     },
   });
 
@@ -40,30 +34,26 @@ async function bootstrap() {
   const elogger = new Logger('EventLogger');
   const qlogger = new Logger('QueryLogger');
 
-  ebus.subscribe(e => {
-
+  ebus.subscribe((e) => {
     elogger.log(
       // `${inspect(e)}`,
       e.constructor.name,
     );
-  })
+  });
 
-
-  cbus.subscribe(e => {
+  cbus.subscribe((e) => {
     clogger.log(`${inspect(e)}, ${e.constructor.name}`);
-  })
+  });
 
-  qbus.subscribe(e => {
+  qbus.subscribe((e) => {
     qlogger.log(e.constructor.name);
-  })
-
+  });
 
   await app.listen();
 
   clogger.log(
-    `Starter user service as ${IS_SCALE_NODE ? 'Scale node' : 'Ma;in node'}`,
+    `Starter user service as ${config.get('scalet') ? 'Scale node' : 'Ma;in node'}`,
   );
-
 
   const publisher = app.get(EventPublisher);
   prepareModels(publisher);

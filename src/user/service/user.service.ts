@@ -6,8 +6,8 @@ import { steam32to64, steam64to32 } from 'src/user/util/steamIds';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EventBus } from '@nestjs/cqrs';
-import { IS_SCALE_NODE, STEAM_KEY } from 'src/config/env';
 import { UserUpdatedInnerEvent } from 'src/user/event/user-updated-inner.event';
+import { ConfigService } from '@nestjs/config';
 
 const steamapi = create({
   baseURL: 'http://api.steampowered.com',
@@ -33,6 +33,7 @@ export class UserService {
     private readonly userEntityRepository: Repository<UserEntity>,
     private readonly ebus: EventBus,
     private schedulerRegistry: SchedulerRegistry,
+    private readonly config: ConfigService,
   ) {
     this.handleCron();
     console.log(this.schedulerRegistry.getCronJobs());
@@ -42,7 +43,7 @@ export class UserService {
     name: 'username resolve',
   })
   async handleCron() {
-    if (IS_SCALE_NODE) return;
+    if (this.config.get('scalet')) return;
     this.logger.log(`Starting resolving names`);
     await this.usernameResolverTask();
     this.logger.log(`Resolved names`);
@@ -94,7 +95,7 @@ export class UserService {
     const res = await steamapi.get<any>(
       '/ISteamUser/GetPlayerSummaries/v0002',
       {
-        key: STEAM_KEY(),
+        key: this.config.get('steamKey'),
         steamids: steamIds,
       },
     );
