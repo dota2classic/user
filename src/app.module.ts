@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Entities } from './config/typeorm.config';
+import { getTypeormConfig } from './config/typeorm.config';
 import { ClientsModule, RedisOptions, Transport } from '@nestjs/microservices';
 import { UserProviders } from './user';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppService } from 'src/app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from 'src/config/configuration';
+import { Entities } from 'src/config/entities';
 
 @Module({
   imports: [
@@ -28,17 +29,11 @@ import configuration from 'src/config/configuration';
     TypeOrmModule.forRootAsync({
       useFactory(config: ConfigService): TypeOrmModuleOptions {
         return {
+          ...getTypeormConfig(config),
           type: 'postgres',
-          database: 'postgres',
-          host: config.get('postgres.host'),
-          port: 5432,
-          username: config.get('postgres.username'),
-          password: config.get('postgres.password'),
-          entities: Entities,
-          synchronize: true,
-          dropSchema: false,
-
-          ssl: false,
+          migrations: ['dist/config/migrations/*.*'],
+          migrationsRun: true,
+          logging: undefined,
         };
       },
       imports: [],
