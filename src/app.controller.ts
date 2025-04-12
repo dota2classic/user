@@ -19,6 +19,8 @@ import { GetRoleSubscriptionsQuery } from 'src/gateway/queries/user/GetRoleSubsc
 import { GetRoleSubscriptionsQueryResult } from 'src/gateway/queries/user/GetRoleSubscriptions/get-role-subscriptions-query.result';
 import { UserLoggedInEvent } from './gateway/events/user/user-logged-in.event';
 import { ConfigService } from '@nestjs/config';
+import { FindByNameQuery } from 'src/gateway/queries/FindByName/find-by-name.query';
+import { FindByNameQueryResult } from 'src/gateway/queries/FindByName/find-by-name-query.result';
 
 @Controller()
 export class AppController {
@@ -46,6 +48,13 @@ export class AppController {
   @MessagePattern(GetAllQuery.name)
   async GetAllQuery(query: GetAllQuery): Promise<GetAllQueryResult> {
     return this.qbus.execute(construct(GetAllQuery, query));
+  }
+
+  @MessagePattern(FindByNameQuery.name)
+  async FindByNameQuery(
+    query: FindByNameQuery,
+  ): Promise<FindByNameQueryResult> {
+    return this.qbus.execute(construct(FindByNameQuery, query));
   }
 
   @MessagePattern(GetUserInfoQuery.name)

@@ -4,7 +4,7 @@ import { FindByNameQuery } from 'src/gateway/queries/FindByName/find-by-name.que
 import { FindByNameQueryResult } from 'src/gateway/queries/FindByName/find-by-name-query.result';
 import { UserEntity } from 'src/user/model/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Like, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 @QueryHandler(FindByNameQuery)
 export class FindByNameHandler
@@ -19,7 +19,7 @@ export class FindByNameHandler
   ) {}
 
   async execute(command: FindByNameQuery): Promise<FindByNameQueryResult> {
-    const parametrizedLike = `%${command.query.replace(/%/g, '')}%`;;
+    const parametrizedLike = `%${command.query.replace(/%/g, '')}%`;
     const a = await this.ds.query<{ steam_id: string }[]>(
       `
 select
@@ -32,7 +32,7 @@ where
 order by 2 desc
 limit $3
     `,
-      [parametrizedLike, command.prefer, co;mmand.limit],
+      [parametrizedLike, command.prefer, command.limit],
     );
 
     return new FindByNameQueryResult(a.map((t) => t.steam_id));
