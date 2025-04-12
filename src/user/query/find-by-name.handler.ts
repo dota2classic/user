@@ -4,7 +4,7 @@ import { FindByNameQuery } from 'src/gateway/queries/FindByName/find-by-name.que
 import { FindByNameQueryResult } from 'src/gateway/queries/FindByName/find-by-name-query.result';
 import { UserEntity } from 'src/user/model/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { DataSource, Like, Repository } from 'typeorm';
 
 @QueryHandler(FindByNameQuery)
 export class FindByNameHandler
@@ -15,18 +15,26 @@ export class FindByNameHandler
   constructor(
     @InjectRepository(UserEntity)
     private readonly userEntityRepository: Repository<UserEntity>,
+    private readonly ds: DataSource,
   ) {}
 
   async execute(command: FindByNameQuery): Promise<FindByNameQueryResult> {
-    const ids = await this.userEntityRepository
-      .find({
-        where: {
-          name: Like(`%${command.query}%`),
-        },
-        take: command.limit,
-      })
-      .then((it) => it.map((u) => u.steam_id));
+    const parametrizedLike = `%${command.query.replace(/%/g, '')}%`;;
+    const a = await this.ds.query<{ steam_id: string }[]>(
+      `
+select
+    ue.steam_id,
+    case when ue.steam_id in ($2) then 10000 else 1 end as score
+from
+    user_entity ue
+where
+    ue.name like $1
+order by 2 desc
+limit $3
+    `,
+      [parametrizedLike, command.prefer, co;mmand.limit],
+    );
 
-    return new FindByNameQueryResult(ids);
+    return new FindByNameQueryResult(a.map((t) => t.steam_id));
   }
 }

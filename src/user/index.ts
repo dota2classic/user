@@ -12,6 +12,7 @@ import { RoleLifetimeUpdatedHandler } from 'src/user/event-handler/role-lifetime
 import { GetRoleSubscriptionsHandler } from 'src/user/query/GetRoleSubscriptions/get-role-subscriptions.handler';
 import { UserLoggedInHandler } from 'src/user/event-handler/user-logged-in.handler';
 import { UserUpdatedInnerHandler } from 'src/user/event-handler/user-updated-inner.handler';
+import { FindByNameHandler } from 'src/user/query/find-by-name.handler';
 
 const Sagas = [];
 const EventHandlers = [
@@ -29,6 +30,7 @@ const QueryHandlers = [
   GetConnectionsHandler,
   UpdateUserRolesHandler,
   GetRoleSubscriptionsHandler,
+  FindByNameHandler,
 ];
 const CommandHandlers = [AttachUserConnectionHandler, UpdateUserRolesHandler];
 export const UserProviders = [
