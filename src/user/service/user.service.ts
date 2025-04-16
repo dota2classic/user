@@ -108,6 +108,7 @@ export class UserService implements OnApplicationBootstrap {
   }
 
   async onApplicationBootstrap() {
+    if (this.config.get('scalet')) return;
     // Populate cache
     const chunkSize = 100;
     const total = await this.userEntityRepository.count();
