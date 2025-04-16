@@ -341,10 +341,10 @@
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
 
-"@dota2classic/caches@^0.0.16":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@dota2classic/caches/-/caches-0.0.16.tgz#cbde1bfc97eb5918dea5d5b6d458a8d311e4a3ae"
-  integrity sha512-A++uU0gYJGX/4S0+ceJCjg+YmXrSZSIR8FHzGNG/oTJhBxraz/Std97ezJZEuiIg2pTpj9U8bDjOtz6O/CaFDQ==
+"@dota2classic/caches@^0.0.18":
+  version "0.0.18"
+  resolved "https://registry.yarnpkg.com/@dota2classic/caches/-/caches-0.0.18.tgz#fea5f7f4c374714df04b06b6d71d83f1f8c2a6f1"
+  integrity sha512-44IawMTrpSBr4qj1o3VKJGja2CFnqi6EhP42fQnUJRUSfidY/e0I5nMGw/LTwAJAgnm/Smy5ydwpxXCfybiqwA==
   dependencies:
     ioredis "^5.6.1"
     memoizee "^0.4.17"

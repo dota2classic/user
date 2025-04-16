@@ -39,11 +39,14 @@ export class UserUpdatedInnerHandler
       ),
     );
 
-    await this.user.set({
-      steamId: event.steamId,
-      name: user.name,
-      avatar: user.avatar,
-      roles: user.activeRoles,
-    });
+    await this.user.save(
+      {
+        steamId: event.steamId,
+        name: user.name,
+        avatar: user.avatar,
+        roles: user.activeRoles,
+      },
+      0,
+    );
   }
 }

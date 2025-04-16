@@ -130,7 +130,7 @@ export class UserService implements OnApplicationBootstrap {
           }) satisfies UserFastProfileDto,
       );
 
-      await Promise.all(users.map((t) => this.user.set(t)));
+      await Promise.all(users.map((t) => this.user.save(t, 0)));
       this.logger.log(`Batch ${i} loaded to cache`);
     }
   }
