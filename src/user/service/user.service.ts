@@ -103,7 +103,6 @@ export class UserService implements OnApplicationBootstrap {
         steamids: steamIds,
       },
     );
-
     return res.data!!.response.players;
   }
 
