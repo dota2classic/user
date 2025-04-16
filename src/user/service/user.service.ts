@@ -111,7 +111,7 @@ export class UserService implements OnApplicationBootstrap {
     // Populate cache
     const chunkSize = 100;
     const total = await this.userEntityRepository.count();
-    for (let i = 0; i < Math.max(total / chunkSize); i++) {
+    for (let i = 0; i < Math.ceil(total / chunkSize); i++) {
       const batch = await this.userEntityRepository.find({
         order: {
           steam_id: 'ASC',
