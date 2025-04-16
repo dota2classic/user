@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { UserEntity } from 'src/user/model/user.entity';
 import { create } from 'apisauce';
@@ -8,6 +8,9 @@ import { Repository } from 'typeorm';
 import { EventBus } from '@nestjs/cqrs';
 import { UserUpdatedInnerEvent } from 'src/user/event/user-updated-inner.event';
 import { ConfigService } from '@nestjs/config';
+import * as console from 'console';
+import { UserProfileFastService } from '@dota2classic/caches/dist/service/user-profile-fast.service';
+import { UserFastProfileDto } from 'src/gateway/caches/user-fast-profile.dto';
 
 const steamapi = create({
   baseURL: 'http://api.steampowered.com',
@@ -25,7 +28,7 @@ interface SteamProfile {
 }
 
 @Injectable()
-export class UserService {
+export class UserService implements OnApplicationBootstrap {
   private readonly logger = new Logger(UserService.name);
 
   constructor(
@@ -34,6 +37,7 @@ export class UserService {
     private readonly ebus: EventBus,
     private schedulerRegistry: SchedulerRegistry,
     private readonly config: ConfigService,
+    private readonly user: UserProfileFastService<UserFastProfileDto>,
   ) {
     this.handleCron();
     console.log(this.schedulerRegistry.getCronJobs());
@@ -101,5 +105,33 @@ export class UserService {
     );
 
     return res.data!!.response.players;
+  }
+
+  async onApplicationBootstrap() {
+    // Populate cache
+    const chunkSize = 100;
+    const total = await this.userEntityRepository.count();
+    for (let i = 0; i < Math.max(total / chunkSize); i++) {
+      const batch = await this.userEntityRepository.find({
+        order: {
+          steam_id: 'ASC',
+        },
+        skip: i * chunkSize,
+        take: chunkSize,
+      });
+
+      const users: UserFastProfileDto[] = batch.map(
+        (b) =>
+          ({
+            steamId: b.steam_id,
+            avatar: b.avatar,
+            name: b.name,
+            roles: b.activeRoles,
+          }) satisfies UserFastProfileDto,
+      );
+
+      await Promise.all(users.map((t) => this.user.set(t)));
+      this.logger.log(`Batch ${i} loaded to cache`);
+    }
   }
 }

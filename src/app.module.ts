@@ -10,6 +10,7 @@ import { AppService } from 'src/app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from 'src/config/configuration';
 import { Entities } from 'src/config/entities';
+import { UserProfileModule } from '@dota2classic/caches';
 
 @Module({
   imports: [
@@ -23,6 +24,17 @@ import { Entities } from 'src/config/entities';
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,
+    }),
+    UserProfileModule.registerAsync({
+      imports: [],
+      useFactory(config: ConfigService) {
+        return {
+          host: config.get('redis.host'),
+          password: config.get('redis.password'),
+          port: 6379,
+        };
+      },
+      inject: [ConfigService],
     }),
     CqrsModule,
     ScheduleModule.forRoot(),

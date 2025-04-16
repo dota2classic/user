@@ -7,6 +7,8 @@ import { UserRoleLifetimeEntity } from 'src/user/model/user-role-lifetime.entity
 import { UserUpdatedEvent } from 'src/gateway/events/user/user-updated.event';
 import { UserEntry } from 'src/gateway/queries/GetAll/get-all-query.result';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
+import { UserProfileFastService } from '@dota2classic/caches/dist/service/user-profile-fast.service';
+import { UserFastProfileDto } from 'src/gateway/caches/user-fast-profile.dto';
 
 @EventsHandler(UserUpdatedInnerEvent)
 export class UserUpdatedInnerHandler
@@ -18,6 +20,7 @@ export class UserUpdatedInnerHandler
     @InjectRepository(UserRoleLifetimeEntity)
     private readonly userRoleLifetimeEntityRepository: Repository<UserRoleLifetimeEntity>,
     private readonly ebus: EventBus,
+    private readonly user: UserProfileFastService<UserFastProfileDto>,
   ) {}
 
   async handle(event: UserUpdatedInnerEvent) {
@@ -35,5 +38,12 @@ export class UserUpdatedInnerHandler
         ),
       ),
     );
+
+    await this.user.set({
+      steamId: event.steamId,
+      name: user.name,
+      avatar: user.avatar,
+      roles: user.activeRoles,
+    });
   }
 }
