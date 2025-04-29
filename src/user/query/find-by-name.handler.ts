@@ -28,7 +28,7 @@ select
 from
     user_entity ue
 where
-    ue.name like $1
+    ue.name ilike $1
 order by 2 desc
 limit $3
     `,
