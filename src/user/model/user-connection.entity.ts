@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { UserConnection } from '../../gateway/shared-types/user-connection';
 
@@ -15,7 +15,7 @@ export class UserConnectionEntity {
   })
   user!: UserEntity;
 
-  @PrimaryColumn({
+  @Column({
     name: 'external_id',
   })
   externalId: string;
