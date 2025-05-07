@@ -30,6 +30,7 @@ export class GetAllConnectionsHandler
         connection: command.connection,
       },
     });
+
     return new GetAllConnectionsQueryResult(
       allEntries.map(
         (t) =>

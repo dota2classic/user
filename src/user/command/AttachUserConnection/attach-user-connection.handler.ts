@@ -8,6 +8,7 @@ import { UserEntity } from '../../model/user.entity';
 import { UserConnectionCreatedEvent } from 'src/gateway/events/user/user-connection-created.event';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
 import { UserConnectionDeletedEvent } from 'src/gateway/events/user/user-connection-deleted.event';
+import { UserUpdatedInnerEvent } from 'src/user/event/user-updated-inner.event';
 
 @CommandHandler(AttachUserConnectionCommand)
 export class AttachUserConnectionHandler
@@ -65,7 +66,9 @@ export class AttachUserConnectionHandler
       },
     });
 
-    if (con) await this.userConnectionEntityRepository.delete(con);
+    if (con) {
+      await this.userConnectionEntityRepository.delete(con);
+    }
 
     con = new UserConnectionEntity();
     con.steamId = u.steam_id;
@@ -79,5 +82,7 @@ export class AttachUserConnectionHandler
         con.externalId,
       ),
     );
+
+    this.ebus.publish(new UserUpdatedInnerEvent(con.steamId));
   }
 }

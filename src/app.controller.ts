@@ -21,6 +21,7 @@ import { UserLoggedInEvent } from './gateway/events/user/user-logged-in.event';
 import { ConfigService } from '@nestjs/config';
 import { FindByNameQuery } from 'src/gateway/queries/FindByName/find-by-name.query';
 import { FindByNameQueryResult } from 'src/gateway/queries/FindByName/find-by-name-query.result';
+import { RemoveUserConnectionCommand } from 'src/gateway/commands/remove-user-connection.command';
 
 @Controller()
 export class AppController {
@@ -83,6 +84,13 @@ export class AppController {
     query: AttachUserConnectionCommand,
   ): Promise<GetUserInfoQueryResult> {
     return this.cbus.execute(construct(AttachUserConnectionCommand, query));
+  }
+
+  @MessagePattern(RemoveUserConnectionCommand.name)
+  async RemoveUserConnectionCommand(
+    query: RemoveUserConnectionCommand,
+  ): Promise<GetUserInfoQueryResult> {
+    return this.cbus.execute(construct(RemoveUserConnectionCommand, query));
   }
 
   @EventPattern(UserRolesUpdatedEvent.name)

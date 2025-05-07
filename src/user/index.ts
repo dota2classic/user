@@ -13,6 +13,7 @@ import { GetRoleSubscriptionsHandler } from 'src/user/query/GetRoleSubscriptions
 import { UserLoggedInHandler } from 'src/user/event-handler/user-logged-in.handler';
 import { UserUpdatedInnerHandler } from 'src/user/event-handler/user-updated-inner.handler';
 import { FindByNameHandler } from 'src/user/query/find-by-name.handler';
+import { RemoveUserConnectionHandler } from 'src/user/command/RemoveUserConnection/remove-user-connection.handler';
 
 const Sagas = [];
 const EventHandlers = [
@@ -32,7 +33,11 @@ const QueryHandlers = [
   GetRoleSubscriptionsHandler,
   FindByNameHandler,
 ];
-const CommandHandlers = [AttachUserConnectionHandler, UpdateUserRolesHandler];
+const CommandHandlers = [
+  AttachUserConnectionHandler,
+  UpdateUserRolesHandler,
+  RemoveUserConnectionHandler,
+];
 export const UserProviders = [
   ...CommandHandlers,
   ...Sagas,
