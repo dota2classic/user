@@ -46,7 +46,7 @@ export class AttachUserConnectionHandler
         },
       });
 
-    // if there is connection, we delete it(no duplicates)
+    // if there is connection, we delete it (no duplicates)
     if (existingConnection) {
       await this.userConnectionEntityRepository.delete(existingConnection);
       this.ebus.publish(
