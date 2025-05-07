@@ -135,7 +135,7 @@ export class UserService implements OnApplicationBootstrap {
       );
 
       await Promise.all(users.map((t) => this.user.save(t, 0)));
-      this.logger.log(`Batch ${i} loaded to cache`);
+      this.logger.log(`Batch ${i} loaded to cache.`);
     }
   }
 }
