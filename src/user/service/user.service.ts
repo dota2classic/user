@@ -127,6 +127,10 @@ export class UserService implements OnApplicationBootstrap {
             avatar: b.avatar,
             name: b.name,
             roles: b.activeRoles,
+            connections: b.connections.map((it) => ({
+              connection: it.connection,
+              externalId: it.externalId,
+            })),
           }) satisfies UserFastProfileDto,
       );
 

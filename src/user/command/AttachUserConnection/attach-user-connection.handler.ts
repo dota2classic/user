@@ -11,14 +11,13 @@ import { UserConnectionDeletedEvent } from 'src/gateway/events/user/user-connect
 
 @CommandHandler(AttachUserConnectionCommand)
 export class AttachUserConnectionHandler
-  implements ICommandHandler<AttachUserConnectionCommand> {
+  implements ICommandHandler<AttachUserConnectionCommand>
+{
   private readonly logger = new Logger(AttachUserConnectionHandler.name);
 
   constructor(
     @InjectRepository(UserConnectionEntity)
-    private readonly userConnectionEntityRepository: Repository<
-      UserConnectionEntity
-    >,
+    private readonly userConnectionEntityRepository: Repository<UserConnectionEntity>,
     @InjectRepository(UserEntity)
     private readonly userEntityRepository: Repository<UserEntity>,
     private readonly ebus: EventBus,
@@ -28,7 +27,7 @@ export class AttachUserConnectionHandler
     let u = await this.userEntityRepository.findOne({
       where: {
         steam_id: command.playerId.value,
-      }
+      },
     });
     if (!u) {
       u = new UserEntity();
@@ -39,46 +38,45 @@ export class AttachUserConnectionHandler
       u.commit();
     }
 
-    const existingConnection = await this.userConnectionEntityRepository.findOne(
-      {
+    const existingConnection =
+      await this.userConnectionEntityRepository.findOne({
         where: {
           connection: command.connection,
-          external_id: command.externalId,
-        }
-      },
-    );
+          externalId: command.externalId,
+        },
+      });
 
     // if there is connection, we delete it(no duplicates)
     if (existingConnection) {
       await this.userConnectionEntityRepository.delete(existingConnection);
       this.ebus.publish(
         new UserConnectionDeletedEvent(
-          new PlayerId(existingConnection.steam_id),
+          new PlayerId(existingConnection.steamId),
           existingConnection.connection,
-          existingConnection.external_id,
+          existingConnection.externalId,
         ),
       );
     }
 
     let con = await this.userConnectionEntityRepository.findOne({
-      where:{
+      where: {
         connection: command.connection,
-        steam_id: command.playerId.value,
-      }
+        steamId: command.playerId.value,
+      },
     });
 
     if (con) await this.userConnectionEntityRepository.delete(con);
 
     con = new UserConnectionEntity();
-    con.steam_id = u.steam_id;
+    con.steamId = u.steam_id;
     con.connection = command.connection;
-    con.external_id = command.externalId;
+    con.externalId = command.externalId;
     await this.userConnectionEntityRepository.save(con);
     this.ebus.publish(
       new UserConnectionCreatedEvent(
-        new PlayerId(con.steam_id),
+        new PlayerId(con.steamId),
         con.connection,
-        con.external_id,
+        con.externalId,
       ),
     );
   }

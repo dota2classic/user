@@ -1,21 +1,29 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { UserConnection } from '../../gateway/shared-types/user-connection';
 
 @Entity()
 export class UserConnectionEntity {
-  @PrimaryColumn()
-  steam_id: string;
+  @PrimaryColumn({
+    name: 'steam_id',
+  })
+  steamId: string;
 
-  @ManyToOne(t => UserEntity)
+  @ManyToOne((t) => UserEntity)
   @JoinColumn({
     name: 'steam_id',
   })
   user!: UserEntity;
 
-  @PrimaryColumn()
-  external_id: string;
+  @PrimaryColumn({
+    name: 'external_id',
+  })
+  externalId: string;
 
-  @PrimaryColumn()
+  @PrimaryColumn({
+    type: 'enum',
+    enum: UserConnection,
+    enumName: 'user_external_connection',
+  })
   connection: UserConnection;
 }

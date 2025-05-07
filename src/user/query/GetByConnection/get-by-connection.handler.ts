@@ -9,27 +9,26 @@ import { PlayerId } from '../../../gateway/shared-types/player-id';
 
 @QueryHandler(GetByConnectionQuery)
 export class GetByConnectionHandler
-  implements IQueryHandler<GetByConnectionQuery, GetByConnectionQueryResult> {
+  implements IQueryHandler<GetByConnectionQuery, GetByConnectionQueryResult>
+{
   private readonly logger = new Logger(GetByConnectionHandler.name);
 
   constructor(
     @InjectRepository(UserConnectionEntity)
-    private readonly userConnectionEntityRepository: Repository<
-      UserConnectionEntity
-    >,
+    private readonly userConnectionEntityRepository: Repository<UserConnectionEntity>,
   ) {}
 
   async execute(
     command: GetByConnectionQuery,
   ): Promise<GetByConnectionQueryResult> {
     const con = await this.userConnectionEntityRepository.findOne({
-      where :{
+      where: {
         connection: command.connection,
-        external_id: command.externalId
-      }
+        externalId: command.externalId,
+      },
     });
 
-    if (con) return new GetByConnectionQueryResult(new PlayerId(con.steam_id));
+    if (con) return new GetByConnectionQueryResult(new PlayerId(con.steamId));
 
     return new GetByConnectionQueryResult(null);
   }

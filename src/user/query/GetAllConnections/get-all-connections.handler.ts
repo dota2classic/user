@@ -1,4 +1,4 @@
-import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
 import { GetAllConnectionsQuery } from 'src/gateway/queries/GetAllConnections/get-all-connections.query';
 import {
@@ -13,14 +13,13 @@ import { PlayerId } from 'src/gateway/shared-types/player-id';
 @QueryHandler(GetAllConnectionsQuery)
 export class GetAllConnectionsHandler
   implements
-    IQueryHandler<GetAllConnectionsQuery, GetAllConnectionsQueryResult> {
+    IQueryHandler<GetAllConnectionsQuery, GetAllConnectionsQueryResult>
+{
   private readonly logger = new Logger(GetAllConnectionsHandler.name);
 
   constructor(
     @InjectRepository(UserConnectionEntity)
-    private readonly userConnectionEntityRepository: Repository<
-      UserConnectionEntity
-    >,
+    private readonly userConnectionEntityRepository: Repository<UserConnectionEntity>,
   ) {}
 
   async execute(
@@ -29,15 +28,15 @@ export class GetAllConnectionsHandler
     const allEntries = await this.userConnectionEntityRepository.find({
       where: {
         connection: command.connection,
-      }
+      },
     });
     return new GetAllConnectionsQueryResult(
       allEntries.map(
-        t =>
+        (t) =>
           new ConnectionEntry(
-            new PlayerId(t.steam_id),
+            new PlayerId(t.steamId),
             t.connection,
-            t.external_id,
+            t.externalId,
           ),
       ),
     );

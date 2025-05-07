@@ -9,6 +9,7 @@ import { UserEntry } from 'src/gateway/queries/GetAll/get-all-query.result';
 import { PlayerId } from 'src/gateway/shared-types/player-id';
 import { UserProfileFastService } from '@dota2classic/caches/dist/service/user-profile-fast.service';
 import { UserFastProfileDto } from 'src/gateway/caches/user-fast-profile.dto';
+import { UserConnectionEntity } from 'src/user/model/user-connection.entity';
 
 @EventsHandler(UserUpdatedInnerEvent)
 export class UserUpdatedInnerHandler
@@ -19,6 +20,8 @@ export class UserUpdatedInnerHandler
     private readonly userEntityRepository: Repository<UserEntity>,
     @InjectRepository(UserRoleLifetimeEntity)
     private readonly userRoleLifetimeEntityRepository: Repository<UserRoleLifetimeEntity>,
+    @InjectRepository(UserConnectionEntity)
+    private readonly userConnectionEntityRepository: Repository<UserConnectionEntity>,
     private readonly ebus: EventBus,
     private readonly user: UserProfileFastService<UserFastProfileDto>,
   ) {}
@@ -45,6 +48,10 @@ export class UserUpdatedInnerHandler
         name: user.name,
         avatar: user.avatar,
         roles: user.activeRoles,
+        connections: user.connections.map((it) => ({
+          connection: it.connection,
+          externalId: it.externalId,
+        })),
       },
       0,
     );

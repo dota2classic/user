@@ -9,7 +9,8 @@ import { ConnectionEntry } from 'src/gateway/queries/GetAllConnections/get-all-c
 
 @QueryHandler(GetConnectionsQuery)
 export class GetConnectionsHandler
-  implements IQueryHandler<GetConnectionsQuery, GetConnectionsQueryResult> {
+  implements IQueryHandler<GetConnectionsQuery, GetConnectionsQueryResult>
+{
   private readonly logger = new Logger(GetConnectionsHandler.name);
 
   constructor(
@@ -21,14 +22,16 @@ export class GetConnectionsHandler
     command: GetConnectionsQuery,
   ): Promise<GetConnectionsQueryResult> {
     const con = await this.urep.findOne({
-      where: { steam_id: command.playerId.value,
-        connection: command.connection,}
+      where: {
+        steamId: command.playerId.value,
+        connection: command.connection,
+      },
     });
 
-    if(!con) return;
+    if (!con) return;
 
     return new GetConnectionsQueryResult(
-      new ConnectionEntry(command.playerId, con.connection, con.external_id),
+      new ConnectionEntry(command.playerId, con.connection, con.externalId),
     );
   }
 }
