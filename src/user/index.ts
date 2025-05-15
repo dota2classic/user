@@ -14,6 +14,7 @@ import { UserLoggedInHandler } from 'src/user/event-handler/user-logged-in.handl
 import { UserUpdatedInnerHandler } from 'src/user/event-handler/user-updated-inner.handler';
 import { FindByNameHandler } from 'src/user/query/find-by-name.handler';
 import { RemoveUserConnectionHandler } from 'src/user/command/RemoveUserConnection/remove-user-connection.handler';
+import { AddSubscriptionDaysHandler } from 'src/user/command/AddSubscriptionDaysCommand/add-subscription-days.handler';
 
 const Sagas = [];
 const EventHandlers = [
@@ -29,7 +30,6 @@ const QueryHandlers = [
   GetAllHandler,
   GetUserInfoHandler,
   GetConnectionsHandler,
-  UpdateUserRolesHandler,
   GetRoleSubscriptionsHandler,
   FindByNameHandler,
 ];
@@ -37,6 +37,7 @@ const CommandHandlers = [
   AttachUserConnectionHandler,
   UpdateUserRolesHandler,
   RemoveUserConnectionHandler,
+  AddSubscriptionDaysHandler,
 ];
 export const UserProviders = [
   ...CommandHandlers,

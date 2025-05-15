@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Transport } from '@nestjs/microservices';
+import { RedisOptions, RmqOptions, Transport } from '@nestjs/microservices';
 import { CommandBus, EventBus, EventPublisher, QueryBus } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
 import { UserEntity } from 'src/user/model/user.entity';
@@ -16,13 +16,36 @@ export function prepareModels(publisher: EventPublisher) {
 async function bootstrap() {
   const config = new ConfigService(configuration());
 
-  const app = await NestFactory.createMicroservice(AppModule, {
+  const app = await NestFactory.create(AppModule);
+
+  app.connectMicroservice<RedisOptions>({
     transport: Transport.REDIS,
     options: {
       retryAttempts: 3,
       retryDelay: 3000,
       password: config.get('redis.password'),
       host: config.get('redis.host'),
+    },
+  });
+
+  app.connectMicroservice<RmqOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [
+        {
+          hostname: config.get<string>('rabbitmq.host'),
+          port: config.get<number>('rabbitmq.port'),
+          protocol: 'amqp',
+          username: config.get<string>('rabbitmq.user'),
+          password: config.get<string>('rabbitmq.password'),
+        },
+      ],
+      queue: config.get<string>('rabbitmq.payment_queue'),
+      prefetchCount: 5,
+      noAck: false,
+      queueOptions: {
+        durable: true,
+      },
     },
   });
 
@@ -49,7 +72,8 @@ async function bootstrap() {
     qlogger.log(e.constructor.name);
   });
 
-  await app.listen();
+  await app.startAllMicroservices();
+  await app.init();
 
   clogger.log(
     `Starter user service as ${config.get('scalet') ? 'Scale node' : 'Ma;in node'}`,

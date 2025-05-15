@@ -11,6 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from 'src/config/configuration';
 import { Entities } from 'src/config/entities';
 import { UserProfileModule } from '@dota2classic/caches';
+import { RmqController } from 'src/rmq.controller';
 
 @Module({
   imports: [
@@ -69,7 +70,7 @@ import { UserProfileModule } from '@dota2classic/caches';
       },
     ]),
   ],
-  controllers: [AppController],
+  controllers: [AppController, RmqController],
   providers: [...UserProviders, AppService],
 })
 export class AppModule {}
