@@ -5,6 +5,7 @@ import { UserCreatedEvent } from 'src/gateway/events/user/user-created.event';
 import { UserRoleLifetimeEntity } from 'src/user/model/user-role-lifetime.entity';
 import { Role } from 'src/gateway/shared-types/roles';
 import { UserConnectionEntity } from 'src/user/model/user-connection.entity';
+import { RoleLifetime } from 'src/gateway/caches/user-fast-profile.dto';
 
 @Entity()
 export class UserEntity extends AggregateRoot {
@@ -38,6 +39,15 @@ export class UserEntity extends AggregateRoot {
 
   public get activeRoles(): Role[] {
     return this.roles.filter((t) => !t.isExpired).map((it) => it.role);
+  }
+
+  public get activeRoleLifetimes(): RoleLifetime[] {
+    return this.roles
+      .filter((t) => !t.isExpired)
+      .map((it) => ({
+        role: it.role,
+        endTime: it.end_time.toISOString(),
+      }));
   }
 
   public created() {

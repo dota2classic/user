@@ -47,7 +47,7 @@ export class UserUpdatedInnerHandler
         steamId: event.steamId,
         name: user.name,
         avatar: user.avatar,
-        roles: user.activeRoles,
+        roles: user.activeRoleLifetimes,
         connections: user.connections.map((it) => ({
           connection: it.connection,
           externalId: it.externalId,

@@ -126,7 +126,7 @@ export class UserService implements OnApplicationBootstrap {
             steamId: b.steam_id,
             avatar: b.avatar,
             name: b.name,
-            roles: b.activeRoles,
+            roles: b.activeRoleLifetimes,
             connections: b.connections.map((it) => ({
               connection: it.connection,
               externalId: it.externalId,
