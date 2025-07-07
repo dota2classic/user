@@ -17,7 +17,7 @@ export class RmqController {
   @RabbitSubscribe({
     exchange: 'app.events',
     routingKey: UserSubscriptionPaidEvent.name,
-    queue: `api-queue.${UserSubscriptionPaidEvent.name}`,
+    queue: `user-queue.${UserSubscriptionPaidEvent.name}`,
   })
   async UserSubscriptionPaidEvent(data: UserSubscriptionPaidEvent) {
     await this.cbus.execute(
