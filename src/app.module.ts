@@ -12,6 +12,7 @@ import configuration from 'src/config/configuration';
 import { Entities } from 'src/config/entities';
 import { UserProfileModule } from '@dota2classic/caches';
 import { RmqController } from 'src/rmq.controller';
+import { RabbitMQConfig, RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 
 @Module({
   imports: [
@@ -69,7 +70,24 @@ import { RmqController } from 'src/rmq.controller';
         imports: [],
       },
     ]),
+    RabbitMQModule.forRootAsync({
+      useFactory(config: ConfigService): RabbitMQConfig {
+        return {
+          exchanges: [
+            {
+              name: 'app.events',
+              type: 'topic',
+            },
+          ],
+          enableControllerDiscovery: true,
+          uri: `amqp://${config.get('rabbitmq.user')}:${config.get('rabbitmq.password')}@${config.get('rabbitmq.host')}:${config.get('rabbitmq.port')}`,
+        };
+      },
+      imports: [],
+      inject: [ConfigService],
+    }),
   ],
+
   controllers: [AppController, RmqController],
   providers: [...UserProviders, AppService],
 })
