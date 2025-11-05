@@ -19,7 +19,6 @@ export interface ExpectedConfig {
     port: number;
     user: string;
     password: string;
-    paymentQueue: string;
   };
   scalet: boolean;
   steamKey: string;
@@ -47,8 +46,7 @@ export default (): ExpectedConfig => {
       host: process.env.RABBITMQ_HOST || "localhost",
       port: parseInt(process.env.RABBITMQ_PORT || "5672"),
       user: process.env.RABBITMQ_USER || "guest",
-      password: process.env.RABBITMQ_PASSWORD || "guest",
-      paymentQueue: process.env.RABBITMQ_PAYMENT_QUEUE || "payment_events",
+      password: process.env.RABBITMQ_PASSWORD || "guest"
     },
     scalet: process.env.SCALET === "true",
     steamKey: process.env.STEAM_API_KEY || "",
