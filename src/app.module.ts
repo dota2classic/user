@@ -3,7 +3,8 @@ import { AppController } from './app.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { getTypeormConfig } from './config/typeorm.config';
-import { ClientsModule, RedisOptions, Transport } from '@nestjs/microservices';
+import { ClientsModule } from '@nestjs/microservices';
+import { getRedisTransportOptions } from 'src/config/redis.config';
 import { UserProviders } from './user';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppService } from 'src/app.service';
@@ -57,15 +58,7 @@ import { RabbitMQConfig, RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
     ClientsModule.registerAsync([
       {
         name: 'QueryCore',
-        useFactory(config: ConfigService): RedisOptions {
-          return {
-            transport: Transport.REDIS,
-            options: {
-              host: config.get('redis.host'),
-              password: config.get('redis.password'),
-            },
-          };
-        },
+        useFactory: getRedisTransportOptions,
         inject: [ConfigService],
         imports: [],
       },
